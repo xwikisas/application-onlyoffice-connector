@@ -38,7 +38,7 @@
     <url>https://network.xwiki.com</url>
   </issueManagement>
   <properties>
-    <licensing.version>1.2</licensing.version>
+    <licensing.version>1.2-SNAPSHOT</licensing.version>
     <netflux.version>1.3</netflux.version>
   </properties>
   <modules>
