@@ -29,7 +29,7 @@
  </parent>
   <groupId>com.xwiki.onlyoffice-connector</groupId>
   <artifactId>application-onlyoffice-connector</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>pom</packaging>
   <name>OnlyOffice Connector - Parent POM</name>
   <description>Edit attachments with OnlyOffice.</description>
@@ -66,6 +66,6 @@
     <connection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-onlyoffice-connector.git</connection>
     <developerConnection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-onlyoffice-connector.git</developerConnection>
     <url>https://git.xwikisas.com/xwiki-sas-products/application-onlyoffice-connector/</url>
-    <tag>HEAD</tag>
+    <tag>application-onlyoffice-connector-1.0.2</tag>
   </scm>
 </project>
