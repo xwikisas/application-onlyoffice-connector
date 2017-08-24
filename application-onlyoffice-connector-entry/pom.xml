@@ -30,7 +30,7 @@
   <artifactId>application-onlyoffice-connector-entry</artifactId>
   <packaging>xar</packaging>
   <name>OnlyOffice Connector - Entry</name>
-  <description>Edit attachments with OnlyOffice. Note that this a paying application.</description>
+  <description>Edit attachments with OnlyOffice. Note that this is a paying application.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>OnlyOffice Connector Application</xwiki.extension.name>
