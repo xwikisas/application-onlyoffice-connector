@@ -181,7 +181,10 @@ define(['jquery',
     var module = {};
 
     var randString = function () {
-        return new Array(6).fill().map(function () {
+        /** filling an array with Array().fill() will cause a continous loading screen: 'Loading OnlyOffice...' instead of the document being displayed.is in IE
+         *  as a workaround, we use the [0,0,0,0,0,0] array.
+         */
+        return [0,0,0,0,0,0].map(function () {
             return Math.random().toString(32);
         }).join('').replace(/\./g,'');
     };
