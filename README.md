@@ -13,3 +13,4 @@ In order to use this connector, OnlyOffice must be setup using CORS
 of OnlyOffice or you can change the OnlyOffice nginx configuration file:
 /etc/nginx/includes/onlyoffice-documentserver-docservice.conf to the content of
 the supporting file by the same name.
+
