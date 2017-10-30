@@ -1,10 +1,10 @@
-# OnlyOffice Connector application
+# OnlyOffice Connector Application
 
-* Project Lead: [Caleb James DeLisle](https://www.xwikisas.com/xwiki/bin/view/XWiki/cdelisle) 
+* Project Lead: [Caleb James DeLisle](https://github.com/cdelisle) 
 * [Issue Tracker](https://jira.xwikisas.com/projects/ONLYOFFICE) 
 * [Development Practices](http://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices) (as much as you can !)
 * Minimal XWiki version supported: XWiki 8.4
-* License: Proprietary - Copyright XWiki SAS
+* License: LGPL 2.1
 * Translations: N/A 
 * Sonar Dashboard: N/A 
 * Continuous Integration Status: [![Build Status](http://ci.xwikisas.com/buildStatus/icon?job=application-onlyofficeconnector)](http://ci.xwikisas.com/job/application-onlyofficeconnector/)
