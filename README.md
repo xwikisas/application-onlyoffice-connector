@@ -1,7 +1,7 @@
 # OnlyOffice Connector Application
 
 * Project Lead: [Caleb James DeLisle](https://github.com/cdelisle) 
-* [Issue Tracker](https://jira.xwikisas.com/projects/ONLYOFFICE) 
+* [JIRA Issue Tracker (Deprecated)](https://jira.xwikisas.com/projects/ONLYOFFICE), [GitHub Issue Tracker](https://github.com/xwikisas/application-onlyoffice-connector/issues)
 * [Development Practices](http://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices) (as much as you can !)
 * Minimal XWiki version supported: XWiki 8.4
 * License: LGPL 2.1

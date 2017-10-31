@@ -34,13 +34,12 @@
   <name>OnlyOffice Connector - Parent POM</name>
   <description>Edit attachments with OnlyOffice.</description>
   <issueManagement>
-    <system>xwiki-network</system>
-    <url>https://network.xwiki.com</url>
+    <system>GitHub</system>
+    <url>https://github.com/xwikisas/application-onlyoffice-connector/issues</url>
   </issueManagement>
   <properties>
     <licensing.version>1.5.4</licensing.version>
     <netflux.version>1.3</netflux.version>
-    <xwiki.issueManagement.jira.id>ONLYOFFICE</xwiki.issueManagement.jira.id>
   </properties>
   <modules>
     <module>application-onlyoffice-connector-entry</module>
@@ -64,9 +63,9 @@
     </repository>
   </repositories>
   <scm>
-    <connection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-onlyoffice-connector.git</connection>
-    <developerConnection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-onlyoffice-connector.git</developerConnection>
-    <url>https://git.xwikisas.com/xwiki-sas-products/application-onlyoffice-connector/</url>
+    <connection>scm:git:https://github.com/xwikisas/application-onlyoffice-connector.git</connection>
+    <developerConnection>scm:git:https://github.com/xwikisas/application-onlyoffice-connector.git</developerConnection>
+    <url>https://github.com/xwikisas/application-onlyoffice-connector/</url>
     <tag>HEAD</tag>
   </scm>
 </project>
