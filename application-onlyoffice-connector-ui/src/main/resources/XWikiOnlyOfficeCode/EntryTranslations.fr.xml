@@ -20,15 +20,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWikiOnlyOfficeConnector.EntryTranslations" locale="fr">
-  <web>XWikiOnlyOfficeConnector</web>
+<xwikidoc version="1.2" reference="XWikiOnlyOfficeCode.EntryTranslations" locale="fr">
+  <web>XWikiOnlyOfficeCode</web>
   <name>EntryTranslations</name>
   <language>fr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1482306548000</creationDate>
-  <parent>XWikiOnlyOfficeConnector.ConfigurationClass</parent>
+  <parent>XWikiOnlyOfficeCode.ConfigurationClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1482306548000</date>

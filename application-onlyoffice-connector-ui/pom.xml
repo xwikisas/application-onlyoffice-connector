@@ -27,26 +27,33 @@
     <artifactId>application-onlyoffice-connector</artifactId>
     <version>1.1-SNAPSHOT</version>
   </parent>
-  <artifactId>application-onlyoffice-connector-entry</artifactId>
+  <artifactId>application-onlyoffice-connector-ui</artifactId>
   <packaging>xar</packaging>
-  <name>OnlyOffice Connector - Entry</name>
+  <name>OnlyOffice Connector - UI</name>
   <description>Edit attachments with OnlyOffice. Note that this is a paying application.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>OnlyOffice Connector Application</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>
+      com.xwiki.onlyoffice-connector:application-onlyoffice-connector-entry,
+      com.xwiki.onlyoffice-connector:application-onlyoffice-connector-main
+    </xwiki.extension.features>
+    <!-- The list of documents the user can access without a license. -->
+    <xwiki.extension.licensing.excludedDocuments>
+      XWikiOnlyOfficeCode.ConfigurationClass,XWikiOnlyOfficeCode.EntryTranslations
+    </xwiki.extension.licensing.excludedDocuments>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.xwiki.onlyoffice-connector</groupId>
-      <artifactId>application-onlyoffice-connector-main</artifactId>
-      <version>1.1-SNAPSHOT</version>
-      <type>xar</type>
-      <scope>runtime</scope>
+      <groupId>com.xwiki.licensing</groupId>
+      <artifactId>application-licensing-licensor-api</artifactId>
+      <version>${licensing.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-message</artifactId>
-      <version>${rendering.version}</version>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>xwiki-contrib-netflux</artifactId>
+      <version>${netflux.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -59,6 +66,18 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-message</artifactId>
+      <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

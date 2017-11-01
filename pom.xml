@@ -38,12 +38,11 @@
     <url>https://github.com/xwikisas/application-onlyoffice-connector/issues</url>
   </issueManagement>
   <properties>
-    <licensing.version>1.5.4-milestone-4</licensing.version>
+    <licensing.version>1.6-SNAPSHOT</licensing.version>
     <netflux.version>1.3</netflux.version>
   </properties>
   <modules>
-    <module>application-onlyoffice-connector-entry</module>
-    <module>application-onlyoffice-connector-main</module>
+    <module>application-onlyoffice-connector-ui</module>
   </modules>
   <!-- Even though this repository is already declared in the parent POM, we still explicitly redeclare it for
        convenience. This makes it simpler to build this project without having to declare this repository in one's own
