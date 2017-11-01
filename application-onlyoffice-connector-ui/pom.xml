@@ -41,7 +41,8 @@
     </xwiki.extension.features>
     <!-- The list of documents the user can access without a license. -->
     <xwiki.extension.licensing.excludedDocuments>
-      XWikiOnlyOfficeCode.ConfigurationClass,XWikiOnlyOfficeCode.EntryTranslations
+      XWikiOnlyOfficeCode.ConfigurationClass,
+      XWikiOnlyOfficeCode.EntryTranslations
     </xwiki.extension.licensing.excludedDocuments>
   </properties>
   <dependencies>
