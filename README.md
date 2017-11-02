@@ -7,7 +7,7 @@
 * License: LGPL 2.1
 * Translations: N/A 
 * Sonar Dashboard: N/A 
-* Continuous Integration Status: [![Build Status](http://ci.xwikisas.com/buildStatus/icon?job=application-onlyofficeconnector)](http://ci.xwikisas.com/job/application-onlyofficeconnector/)
+* Continuous Integration Status: [![Build Status](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-onlyoffice-connector/job/master/badge/icon)](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-onlyoffice-connector/job/master/)
 
 # Description
 
