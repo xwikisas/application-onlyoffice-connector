@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWikiOnlyOfficeCode.EntryTranslations" locale="">
+<xwikidoc version="1.2" reference="XWikiOnlyOfficeCode.Translations" locale="">
   <web>XWikiOnlyOfficeCode</web>
-  <name>EntryTranslations</name>
+  <name>Translations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
@@ -34,14 +34,14 @@
   <date>1476445812000</date>
   <contentUpdateDate>1476445812000</contentUpdateDate>
   <version>1.1</version>
-  <title>Entry Translations</title>
+  <title>Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>xoo.error.noValidLicense=There is no valid license for the OnlyOffice Connector application. To get one, please visit the {0}Licenses section{1}.</content>
   <object>
-    <name>XWikiOnlyOfficeCode.EntryTranslations</name>
+    <name>XWikiOnlyOfficeCode.Translations</name>
     <number>0</number>
     <className>XWiki.TranslationDocumentClass</className>
     <guid>f3b87ed2-0f4a-4a42-9b6a-42637f597281</guid>

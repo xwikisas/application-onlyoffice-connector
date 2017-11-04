@@ -39,10 +39,10 @@
       com.xwiki.onlyoffice-connector:application-onlyoffice-connector-entry,
       com.xwiki.onlyoffice-connector:application-onlyoffice-connector-main
     </xwiki.extension.features>
-    <!-- The list of documents the user can access without a license. -->
+    <!-- The list of documents that are not covered by the extension license. The user that installs the extension has
+      full access to these documents (view, edit, delete) without having a license, so use this property wisely. -->
     <xwiki.extension.licensing.excludedDocuments>
-      XWikiOnlyOfficeCode.ConfigurationClass,
-      XWikiOnlyOfficeCode.EntryTranslations
+      XWikiOnlyOfficeCode.ConfigurationClass
     </xwiki.extension.licensing.excludedDocuments>
   </properties>
   <dependencies>
