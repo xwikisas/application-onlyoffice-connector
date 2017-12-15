@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>xoo.error.noValidLicense=There is no valid license for the OnlyOffice Connector application. To get one, please visit the {0}Licenses section{1}.</content>
+  <content>xoo.extension.name=OnlyOffice Connector Application</content>
   <object>
     <name>XWikiOnlyOfficeCode.Translations</name>
     <number>0</number>
