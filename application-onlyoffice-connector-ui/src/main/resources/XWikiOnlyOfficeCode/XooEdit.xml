@@ -452,7 +452,7 @@ require(['jquery', 'xwiki-meta'],function(jQuery, Meta) {
 
         jQuery("#_attachments span.name").each(function (i, elem) {
             if(jQuery(elem.parentNode).find("div.xwikibuttonlinks &gt; a.oOEdit").length) { return; }
-            var fileName = jQuery(elem).find('a').text();
+            var fileName = jQuery(elem).find('a').text().trim();
             var fileType = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase();
             var whatCanDo = canDoByExt[fileType];
             if (!whatCanDo) { return; }
