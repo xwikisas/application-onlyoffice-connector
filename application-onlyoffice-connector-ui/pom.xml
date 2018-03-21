@@ -34,6 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>OnlyOffice Connector Application</xwiki.extension.name>
+    <xwiki.extension.category>application</xwiki.extension.category>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>
       com.xwiki.onlyoffice-connector:application-onlyoffice-connector-entry,
