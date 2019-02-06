@@ -40,5 +40,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>
-xoo.error.noValidLicense=Il n'y a pas de licence valide pour l'application OnlyOffice Connector. Pour en obtenir une, merci de visiter {0}Licenses section{1}.</content>
+xoo.error.noValidLicense=Il n'y a pas de licence valide pour l'application OnlyOffice Connector. Pour en obtenir une, merci de visiter {0}Licenses section{1}.
+xoo.extension.name=Application OnlyOffice Connector</content>
 </xwikidoc>
