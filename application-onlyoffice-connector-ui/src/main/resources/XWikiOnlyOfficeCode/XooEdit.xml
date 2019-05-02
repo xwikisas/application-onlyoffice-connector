@@ -152,9 +152,9 @@
                 p[0].innerHTML = err;
             }
         }
-        require(["$doc.getAttachmentURL('xwiki-onlyoffice.js')" + '?cb=' + new Date().getTime()], function (oojs) {
+        require(["$doc.getAttachmentURL('xwiki-onlyoffice.js','download','cb=dateOfToday')".replace('dateOfToday', new Date().getTime())], function (oojs) {
             oojs({
-                ATTACH_URL: "$docu.getAttachmentURL($filename)" + '?cb=' + new Date().getTime(),
+                ATTACH_URL: "$docu.getAttachmentURL($filename,'download','cb=dateOfToday')".replace('dateOfToday', new Date().getTime()),
                 FILEUPLOAD_URL: "${OO_SERVER}/FileUploader.ashx",
 
                 // Realtime
