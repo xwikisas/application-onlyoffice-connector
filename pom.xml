@@ -29,7 +29,7 @@
  </parent>
   <groupId>com.xwiki.onlyoffice-connector</groupId>
   <artifactId>application-onlyoffice-connector</artifactId>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>OnlyOffice Connector - Parent POM</name>
   <description>Edit attachments with OnlyOffice.</description>
