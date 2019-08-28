@@ -38,7 +38,7 @@
     <url>https://github.com/xwikisas/application-onlyoffice-connector/issues</url>
   </issueManagement>
   <properties>
-    <licensing.version>1.14.1</licensing.version>
+    <licensing.version>1.14.3</licensing.version>
     <netflux.version>1.5</netflux.version>
   </properties>
   <modules>
