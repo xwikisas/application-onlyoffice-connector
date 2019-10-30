@@ -167,7 +167,7 @@
                 USERNAME: "$xcontext.getUser()",
                 USERPRETTYNAME: '$xwiki.getUserName("$xcontext.getUser()", false)',
                 CANEDIT: ${canEdit},
-                LANG: "en", // TODO
+                LANG: "$xcontext.locale",
                 CSRF_TOKEN: "$!{services.csrf.token}",
                 DOCU_VIEW_URL: "${docu.getURL('view')}"
             });
