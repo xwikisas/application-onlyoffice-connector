@@ -25,7 +25,7 @@
   <parent>
    <groupId>com.xwiki.parent</groupId>
    <artifactId>xwikisas-parent-platform</artifactId>
-   <version>8.4-12</version>
+   <version>9.11-5</version>
  </parent>
   <groupId>com.xwiki.onlyoffice-connector</groupId>
   <artifactId>application-onlyoffice-connector</artifactId>
@@ -38,7 +38,7 @@
     <url>https://github.com/xwikisas/application-onlyoffice-connector/issues</url>
   </issueManagement>
   <properties>
-    <licensing.version>1.14.4</licensing.version>
+    <licensing.version>1.15</licensing.version>
     <netflux.version>1.5</netflux.version>
   </properties>
   <modules>
