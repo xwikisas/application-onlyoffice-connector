@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWikiOnlyOfficeCode.XooEdit" locale="">
+<xwikidoc version="1.3" reference="XWikiOnlyOfficeCode.XooEdit" locale="">
   <web>XWikiOnlyOfficeCode</web>
   <name>XooEdit</name>
   <language/>
@@ -39,206 +39,208 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}{{html clean=false}}
-#set($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-#set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-#set($OO_CONF_OBJ = $OO_CONF_DOC.getObject("XWikiOnlyOfficeCode.ConfigurationClass"))
-#set($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').getValue())
+  <content>{{velocity}}
+#set ($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
+#set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
+#set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
+#set ($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').getValue())
 #if ("$!OO_USE_GLOBAL_CONFIG" != "0" )
-    #set($OO_CONF_REF = $services.model.createDocumentReference($xcontext.getMainWikiName(), 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-    #set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-    #set($OO_CONF_OBJ = $OO_CONF_DOC.getObject("XWikiOnlyOfficeCode.ConfigurationClass"))
+  #set ($OO_CONF_REF = $services.model.createDocumentReference($xcontext.getMainWikiName(), 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
+  #set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
+  #set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
 #end
-#set($OO_SERVER = $OO_CONF_OBJ.getProperty('onlyOfficeServer').getValue())
-#set($ALLOW_REALTIME = $OO_CONF_OBJ.getProperty('enableRealtime').getValue())
-#if ("$!OO_SERVER" == "")
-    #set($OO_SERVER = "https://onlyoffice.xwiki.com")
+#set ($OO_SERVER = $OO_CONF_OBJ.getProperty('onlyOfficeServer').getValue())
+#set ($ALLOW_REALTIME = $OO_CONF_OBJ.getProperty('enableRealtime').getValue())
+#if ("$!OO_SERVER" == '')
+  #set ($OO_SERVER = 'https://onlyoffice.xwiki.com')
 #end
-#set($CONVERTABLE_FILETYPES0 = {
-    '.docx': [ '.doc', '.odt', '.html', '.htm', '.rtf', '.txt', '.mht' ],
-    '.xlsx': [ '.xls', '.ods', '.csv' ],
-    '.pptx': [ '.ppt', '.odp', '.ppsx' ]
+#set ($CONVERTABLE_FILETYPES0 = {
+  '.docx': ['.doc', '.odt', '.html', '.htm', '.rtf', '.txt', '.mht'],
+  '.xlsx': ['.xls', '.ods', '.csv'],
+  '.pptx': ['.ppt', '.odp', '.ppsx']
 })
-#set($EDITABLE_FILETYPES = [ '.docx', '.xlsx', '.pptx' ])
+#set ($EDITABLE_FILETYPES = ['.docx', '.xlsx', '.pptx'])
 ##
-#if ("$!request.document" == "")
-    document parameter required
+#if ("$!request.document" == '')
+  document parameter required
 #else
-    #set($docu = $xwiki.getDocument($request.document))
-    #if ("$!request.filename" == "")
-        filename parameter required
-    #else
-        #set($filename = $request.filename)
-        #set($fileType = $filename.substring($filename.lastIndexOf('.')))
-        #set($attachment = $docu.getAttachment($request.filename))
-        #if (!$attachment &amp;&amp; "$!request.new" == "1" &amp;&amp; $EDITABLE_FILETYPES.contains($fileType))
-            ## Get the empty example file corresponding to the current locale.
-            #set ($templatesDoc = $xwiki.getDocument('XWikiOnlyOfficeCode.Templates'))
-            #set ($emptyAttachment = $templatesDoc.getAttachment("empty_${xcontext.locale}${fileType}"))
-            #if (!$emptyAttachment)
-              ## Fallback on default empty example file(en).
-              #set ($emptyAttachment = $doc.getAttachment("empty${fileType}"))
-            #end
-            #if ($emptyAttachment)
-                #set ($attachment = $docu.addAttachment($filename, $emptyAttachment.getContentAsBytes()))
-                #set ($discard = $docu.save("Add new attachment: $filename"))
-            #end
-        #end
+  #set ($docu = $xwiki.getDocument($request.document))
+  #if ("$!request.filename" == '')
+    filename parameter required
+  #else
+    #set ($filename = $request.filename)
+    #set ($fileType = $filename.substring($filename.lastIndexOf('.')))
+    #set ($attachment = $docu.getAttachment($request.filename))
+    #if (!$attachment &amp;&amp; "$!request.new" == '1' &amp;&amp; $EDITABLE_FILETYPES.contains($fileType))
+      ## Get the empty example file corresponding to the current locale.
+      #set ($templatesDoc = $xwiki.getDocument('XWikiOnlyOfficeCode.Templates'))
+      #set ($emptyAttachment = $templatesDoc.getAttachment("empty_${xcontext.locale}${fileType}"))
+      #if (!$emptyAttachment)
+        ## Fallback on default empty example file(en).
+        #set ($emptyAttachment = $doc.getAttachment("empty${fileType}"))
+      #end
+      #if ($emptyAttachment)
+        #set ($attachment = $docu.addAttachment($filename, $emptyAttachment.getContentAsBytes()))
+        #set ($discard = $docu.save("Add new attachment: $filename"))
+      #end
     #end
+  #end
 #end
-#if ("$!attachment" == "")
-    document or attachment not found
+#if (!$attachment)
+  document or attachment not found
 #else
-    #set($mode = "edit")
-    #set($fileNoType = $filename.substring(0, $filename.lastIndexOf('.')))
-    #set($fileType = $filename.substring($filename.lastIndexOf('.')))
-    #if (!$EDITABLE_FILETYPES.contains($fileType))
-        #set($convertableFiletypes = {})
-        #foreach($key in $CONVERTABLE_FILETYPES0.keySet())
-            #foreach($val in $CONVERTABLE_FILETYPES0[$key])
-                #set($discard = $convertableFiletypes.put("$val", "$key"))
-            #end
-        #end
-        #if (!$docu.hasAccessLevel("edit"))
-            #set($mode = "view")
-        #elseif ("$!convertableFiletypes.get($fileType)" != "")
-            #set($convertableTo = "$!convertableFiletypes.get($fileType)")
-            #set($convFilename = "${fileNoType}${convertableTo}")
-            #set($convAttach = $docu.getAttachment($convFilename))
-            #if ("$!convAttach" != "")
-                #set($mode = "convExists")
-            #else
-                #set($mode = "convertable")
-            #end
-        #else
-            #set($mode = "view")
-        #end
+  #set ($mode = 'edit')
+  #set ($fileNoType = $filename.substring(0, $filename.lastIndexOf('.')))
+  #set ($fileType = $filename.substring($filename.lastIndexOf('.')))
+  #if (!$EDITABLE_FILETYPES.contains($fileType))
+    #set ($convertableFiletypes = {})
+    #foreach ($key in $CONVERTABLE_FILETYPES0.keySet())
+      #foreach ($val in $CONVERTABLE_FILETYPES0[$key])
+        #set ($discard = $convertableFiletypes.put("$val", "$key"))
+      #end
     #end
-    #if($mode == "edit")
-        #set($currentAction = "$services.localization.render('editing') ")
-        #set($canEdit = true)
+    #if (!$docu.hasAccessLevel('edit'))
+      #set ($mode = 'view')
+    #elseif ("$!convertableFiletypes.get($fileType)" != '')
+      #set ($convertableTo = "$!convertableFiletypes.get($fileType)")
+      #set ($convFilename = "${fileNoType}${convertableTo}")
+      #set ($convAttach = $docu.getAttachment($convFilename))
+      #if ("$!convAttach" != '')
+        #set ($mode = 'convExists')
+      #else
+        #set ($mode = 'convertable')
+      #end
     #else
-        #set($currentAction = "")
-        #set($canEdit = false)
+      #set ($mode = 'view')
     #end
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
-    &lt;title&gt;${currentAction}$escapetool.xml($request.filename)&lt;/title&gt;
-    #template("stylesheets.vm")
-    &lt;link rel="stylesheet" type="text/css" href="$doc.getAttachmentURL('xwiki-onlyoffice.css')"&gt;
-    &lt;link rel="stylesheet" type="text/css" href="$xwiki.getSkinFile('resources/uicomponents/widgets/notification.css', true)"&gt;
+  #end
+  #if ($mode == 'edit')
+    #set ($currentAction = "$services.localization.render('editing') ")
+    #set ($canEdit = true)
+  #else
+    #set ($currentAction = '')
+    #set ($canEdit = false)
+  #end
+  {{html clean=false}}
+  &lt;!DOCTYPE html&gt;
+  &lt;html&gt;
+    &lt;head&gt;
+      &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+      &lt;title&gt;${currentAction}$escapetool.xml($request.filename)&lt;/title&gt;
+      #template('stylesheets.vm')
+      &lt;link rel="stylesheet" type="text/css" href="$doc.getAttachmentURL('xwiki-onlyoffice.css')"&gt;
+      &lt;link rel="stylesheet" type="text/css" href="$xwiki.getSkinFile('resources/uicomponents/widgets/notification.css', true)"&gt;
 
-    ## Old IE
-    &lt;link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" /&gt;
-    ## Present, HTML5
-    &lt;link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" type="image/png" /&gt;
-    ## The future, scalable icons
-    &lt;link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" type="image/svg+xml" /&gt;
-    ## For smart phones and tablets
-    &lt;link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" /&gt;
+      ## Old IE
+      &lt;link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" /&gt;
+      ## Present, HTML5
+      &lt;link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" type="image/png" /&gt;
+      ## The future, scalable icons
+      &lt;link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" type="image/svg+xml" /&gt;
+      ## For smart phones and tablets
+      &lt;link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" /&gt;
 
-    &lt;script type="text/javascript" src="$services.webjars.url('requirejs', 'require.min.js')"&gt;&lt;/script&gt;
-    &lt;script type="text/javascript" language="javascript"&gt;
+      &lt;script type="text/javascript" src="$services.webjars.url('requirejs', 'require.min.js')"&gt;&lt;/script&gt;
+      &lt;script type="text/javascript" language="javascript"&gt;
         require.config({
-            paths: {
-                'jquery': "$services.webjars.url('jquery', 'jquery.min.js')"
-            }
+          paths: {
+            'jquery': "$services.webjars.url('jquery', 'jquery.min.js')"
+          }
         });
-        require.onError = function (err) {
-            var div = document.getElementById("iframeEditor");
-            if (!div) { return; }
-            var p = div.getElementsByTagName('p');
-            if (p.length) {
-                p[0].innerHTML = err;
-            }
+        require.onError = function(err) {
+          var div = document.getElementById('iframeEditor');
+          if (!div) {
+            return;
+          }
+          var p = div.getElementsByTagName('p');
+          if (p.length) {
+            p[0].innerHTML = err;
+          }
         }
         require(["$doc.getAttachmentURL('xwiki-onlyoffice.js','download','cb=dateOfToday')".replace('dateOfToday', new Date().getTime())], function (oojs) {
-            oojs({
-                ATTACH_URL: "$docu.getAttachmentURL($filename,'download','cb=dateOfToday')".replace('dateOfToday', new Date().getTime()),
-                FILEUPLOAD_URL: "${OO_SERVER}/FileUploader.ashx",
+          oojs({
+            ATTACH_URL: "$docu.getAttachmentURL($filename,'download','cb=dateOfToday')".replace('dateOfToday', new Date().getTime()),
+            FILEUPLOAD_URL: "${OO_SERVER}/FileUploader.ashx",
 
-                // Realtime
-                ALLOW_REALTIME: "$!ALLOW_REALTIME" === "1",
-                OOAPI_PATH: "${OO_SERVER}/web-apps/apps/api/documents/api.js",
-                GETKEY_URL: "$xwiki.getURL("XWikiOnlyOfficeCode.GetKeys", "jsx")",
+            // Realtime
+            ALLOW_REALTIME: "$!ALLOW_REALTIME" === '1',
+            OOAPI_PATH: "${OO_SERVER}/web-apps/apps/api/documents/api.js",
+            GETKEY_URL: "$xwiki.getURL('XWikiOnlyOfficeCode.GetKeys', 'jsx')",
 
-                ##// services.rest.url() doesn't work with an attachment ref
-                REST_DOC_URL: "$services.rest.url($docu.getDocumentReference())",
+            // services.rest.url() doesn't work with an attachment ref
+            REST_DOC_URL: "$services.rest.url($docu.documentReference)",
 
-                DOC_REFERENCE: "$docu.getDocumentReference()",
-                FILENAME: "${filename}",
-                CREATION_DATE: "$datetool",
-                USERNAME: "$xcontext.getUser()",
-                USERPRETTYNAME: '$xwiki.getUserName("$xcontext.getUser()", false)',
-                CANEDIT: ${canEdit},
-                LANG: "$xcontext.locale",
-                CSRF_TOKEN: "$!{services.csrf.token}",
-                DOCU_VIEW_URL: "${docu.getURL('view')}"
-            });
+            DOC_REFERENCE: "$docu.documentReference",
+            FILENAME: "$filename",
+            CREATION_DATE: "$datetool",
+            USERNAME: "$xcontext.user",
+            USERPRETTYNAME: "$xwiki.getUserName($xcontext.user, false)",
+            CANEDIT: "$canEdit",
+            LANG: "$xcontext.locale",
+            CSRF_TOKEN: "$services.csrf.token",
+            DOCU_VIEW_URL: "$docu.URL"
+          });
         });
-    &lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;div class="saveBar"&gt;
+      &lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+      &lt;div class="saveBar"&gt;
         &lt;div class="meta-versionSummary metamodifs"&gt;
-            &lt;table class="saveBarTable" style="width:100%"&gt;
+          &lt;table class="saveBarTable" style="width:100%"&gt;
             &lt;tr style="width:100%"&gt;
-                &lt;td style="vertical-align: middle"&gt;
-                    &lt;a href="${xwiki.getURL("Main.WebHome")}"&gt;&lt;img src="$xwiki.getSkinFile('logo.svg')"&gt;&lt;/a&gt;
-                &lt;/td&gt;
-                &lt;td style="vertical-align: middle"&gt;
-                    &lt;strong&gt;$currentAction&lt;/strong&gt;
-                    &lt;em&gt;$request.filename&lt;/em&gt;
-                    on page
-                    &lt;a href="${docu.getURL('view')}#Attachments" title="$services.localization.render('cancel')"&gt;$docu.displayTitle&lt;/a&gt;
-                &lt;/td&gt;
-                &lt;td style="text-align: right; vertical-align: middle"&gt;
-                    &lt;form id="buttonsForm" onsubmit="return false;"&gt;
-                        #if ($mode == "edit")
-                            &lt;input id="button-sac" class="btn btn-primary" type="submit" value="$services.localization.render('saveandcontinue')" /&gt;
-                            &lt;input id="button-sav" class="btn btn-success" type="submit" value="$services.localization.render('saveandview')" /&gt;
-                        #elseif ($mode == "convExists")
-                            &lt;input id="button-ecv"
-                                   class="btn btn-success"
-                                   type="submit"
-                                   value="Edit $convertableTo version"
-                                   title="This document type ($fileType) cannot be edited with OnlyOffice but another attachment &amp;quot;$convFilename&amp;quot; exists, click to edit it."
-                            /&gt;
-                        #elseif ($mode == "convertable")
-                            &lt;input id="button-cnv"
-                                   data-convertableto="$convertableTo"
-                                   class="btn btn-success"
-                                   type="submit"
-                                   value="Convert to $convertableTo for editing"
-                                   title="In order to edit this document it must first be converted to Microsoft Office&amp;#8482; compatible $convertableTo format"
-                            /&gt;
-                        #end
-                        &lt;input id="button-cancel" class="btn btn-default" type="submit" name="action_cancel" value="$services.localization.render('cancel')" data-redirect-to="${docu.getURL('view')}#Attachments" /&gt;
-                    &lt;/form&gt;
-                &lt;/td&gt;
+              &lt;td style="vertical-align: middle"&gt;
+                &lt;a href="${xwiki.getURL('Main.WebHome')}"&gt;&lt;img src="$xwiki.getSkinFile('logo.svg')"&gt;&lt;/a&gt;
+              &lt;/td&gt;
+              &lt;td style="vertical-align: middle"&gt;
+                &lt;strong&gt;$currentAction&lt;/strong&gt;
+                &lt;em&gt;$request.filename&lt;/em&gt;
+                on page
+                &lt;a href="${docu.URL}#Attachments" title="$services.localization.render('cancel')"&gt;$docu.displayTitle&lt;/a&gt;
+              &lt;/td&gt;
+              &lt;td style="text-align: right; vertical-align: middle"&gt;
+                &lt;form id="buttonsForm" onsubmit="return false;"&gt;
+                  #if ($mode == 'edit')
+                    &lt;input id="button-sac" class="btn btn-primary" type="submit" value="$services.localization.render('saveandcontinue')" /&gt;
+                    &lt;input id="button-sav" class="btn btn-success" type="submit" value="$services.localization.render('saveandview')" /&gt;
+                  #elseif ($mode == 'convExists')
+                    &lt;input id="button-ecv" class="btn btn-success" type="submit" value="Edit $convertableTo version"
+                      title="This document type ($fileType) cannot be edited with OnlyOffice but another attachment &amp;quot;$convFilename&amp;quot; exists, click to edit it."
+                    /&gt;
+                  #elseif ($mode == "convertable")
+                    &lt;input id="button-cnv" class="btn btn-success" type="submit" value="Convert to $convertableTo for editing" data-convertableto="$convertableTo"
+                      title="In order to edit this document it must first be converted to Microsoft Office&amp;#8482; compatible $convertableTo format"
+                    /&gt;
+                  #end
+                  &lt;input id="button-cancel" class="btn btn-default" type="submit" name="action_cancel" value="$services.localization.render('cancel')" data-redirect-to="${docu.URL}#Attachments" /&gt;
+                &lt;/form&gt;
+              &lt;/td&gt;
             &lt;/tr&gt;
-            &lt;/table&gt;
+          &lt;/table&gt;
         &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class="form"&gt;
+      &lt;/div&gt;
+      &lt;div class="form"&gt;
         &lt;div id="iframeEditor"&gt;
-            &lt;p&gt;
-                Loading OnlyOffice... &lt;img src="$xwiki.getSkinFile("resources/icons/xwiki/spinner.gif", true)" /&gt;
-            &lt;/p&gt;
+          &lt;p&gt;
+            Loading OnlyOffice... &lt;img src="$xwiki.getSkinFile('resources/icons/xwiki/spinner.gif', true)" /&gt;
+          &lt;/p&gt;
         &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class="xnotification-container"&gt;
-        &lt;div style="display:none;" class="xnotification xnotification-inprogress"&gt;$services.localization.render('core.editors.saveandcontinue.notification.inprogress')&lt;/div&gt;
-        &lt;div style="display:none;" class="xnotification xnotification-done"&gt;$services.localization.render('core.editors.saveandcontinue.notification.done')&lt;/div&gt;
-        &lt;div style="display:none;" class="xnotification xnotification-error"&gt;$services.localization.render("core.editors.saveandcontinue.notification.error", ["&lt;span id=""ajaxRequestFailureReason""/&gt;"])&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/body&gt;
-&lt;/html&gt;
+      &lt;/div&gt;
+      &lt;div class="xnotification-container"&gt;
+        &lt;div style="display:none;" class="xnotification xnotification-inprogress"&gt;
+          $services.localization.render('core.editors.saveandcontinue.notification.inprogress')
+        &lt;/div&gt;
+        &lt;div style="display:none;" class="xnotification xnotification-done"&gt;
+          $services.localization.render('core.editors.saveandcontinue.notification.done')
+        &lt;/div&gt;
+        &lt;div style="display:none;" class="xnotification xnotification-error"&gt;
+          $services.localization.render("core.editors.saveandcontinue.notification.error", ["&lt;span id='ajaxRequestFailureReason'/&gt;"])
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/body&gt;
+  &lt;/html&gt;
+  {{/html}}
 #end
-{{/html}}{{/velocity}}</content>
+{{/velocity}}</content>
   <attachment>
     <filename>empty.docx</filename>
     <author>xwiki:XWiki.Admin</author>
