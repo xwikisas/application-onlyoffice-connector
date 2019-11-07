@@ -123,12 +123,11 @@
   #end
   {{html clean=false}}
   &lt;!DOCTYPE html&gt;
-  &lt;html&gt;
+  &lt;html id="ooFrame"&gt;
     &lt;head&gt;
       &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
       &lt;title&gt;${currentAction}$escapetool.xml($request.filename)&lt;/title&gt;
       #template('stylesheets.vm')
-      #set ($discard = $xwiki.ssx.use('XWikiOnlyOfficeCode.XooEdit'))
 
       ## Old IE
       &lt;link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" /&gt;
@@ -413,231 +412,212 @@
       <cache/>
     </property>
     <property>
-      <code>// this file is copied into the JSExtension object when producing the XAR
+      <code>// Velocity
+#set($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
+#set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
+#set($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
+#set($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').value)
+#if ("$!OO_USE_GLOBAL_CONFIG" != '0')
+  #set($OO_CONF_REF = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
+  #set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
+  #set($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
+#end
+// this file is copied into the JSExtension object when producing the XAR
 // it should fire everytime a view page is displayed
-require(['jquery', 'xwiki-meta'],function(jQuery, Meta) {
-    // Velocity
-    #set($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-    #set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-    #set($OO_CONF_OBJ = $OO_CONF_DOC.getObject("XWikiOnlyOfficeCode.ConfigurationClass"))
-    #set($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').getValue())
-    #if ("$!OO_USE_GLOBAL_CONFIG" != "0" )
-        #set($OO_CONF_REF = $services.model.createDocumentReference($xcontext.getMainWikiName(), 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-        #set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-        #set($OO_CONF_OBJ = $OO_CONF_DOC.getObject("XWikiOnlyOfficeCode.ConfigurationClass"))
-    #end
+require(['jquery', 'xwiki-meta'],function($, Meta) {
+  var enableCreation = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == '1';
 
-    var enableCreation = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == "1";
-    // Velocity end
+  var MESSAGES = {
+    edit: 'Edit with OnlyOffce',
+    view: 'View in OnlyOffice',
+    convert: 'View/Convert with OnlyOffice'
+  };
+  var ICONS = {
+    edit: 'onlyOffice-logo.png',
+    view: 'onlyOffice-logo-grey.png',
+    convert: 'onlyOffice-logo-blue.png'
+  };
 
-    var MESSAGES = {
-        edit: "Edit with OnlyOffce",
-        view: "View in OnlyOffice",
-        convert: "View/Convert with OnlyOffice"
-    };
-    var ICONS = {
-        edit: "onlyOffice-logo.png",
-        view: "onlyOffice-logo-grey.png",
-        convert: "onlyOffice-logo-blue.png"
-    };
+  var rootURL = XWiki.contextPath + '/' + XWiki.servletpath;
+  var fullName = XWiki.Document.currentDocumentReference.toString();
 
-    var rootURL = XWiki.contextPath + "/" + XWiki.servletpath;
-    var fullName = XWiki.Document.currentDocumentReference.toString();
+  var capitalizeFirstLetter = function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
 
-    var capitalizeFirstLetter = function (string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    };
+  var getExistingNames = function() {
+    return $('#_attachments span.name a').toArray().map(function(a) {
+      return a.innerText;
+    });
+  };
 
-    var getExistingNames = function () {
-        return jQuery('#_attachments span.name a').toArray().map(function(a){ return a.innerText });
-    };
-    // Create untitled documents when no name is given
-    var getDefaultName = function (fileType) {
-        var untitledIndex = 1;
-        var list = getExistingNames();
-        var name = ({ '.xlsx': 'Spreadsheet', '.docx': 'Document', '.pptx': 'Presentation' })[fileType] + ' ' + new Date().toString().split(' ').slice(0,4).join(' ');
-        if (list.indexOf(name + fileType) === -1) { return name; }
-        while (list.indexOf(name + ' - ' + untitledIndex + fileType) !== -1) { untitledIndex++; }
-        return name + ' - ' + untitledIndex;
-    };
+  // Create untitled documents when no name is given
+  var getDefaultName = function(fileType) {
+    var untitledIndex = 1;
+    var list = getExistingNames();
+    var name = ({'.xlsx': 'Spreadsheet', '.docx': 'Document', '.pptx': 'Presentation' })[fileType] + ' ' + new Date().toString().split(' ').slice(0,4).join(' ');
+    if (list.indexOf(name + fileType) === -1) {
+      return name;
+    }
+    while (list.indexOf(name + ' - ' + untitledIndex + fileType) !== -1) {
+      untitledIndex++; 
+    }
+    return name + ' - ' + untitledIndex;
+  };
 
-    // New attachment modal
-    var displayPopupNew = function (type) {
-        XWiki.widgets.NewOOFile = Class.create(XWiki.widgets.ModalPopup, {
-            defaultInteractionParameters : {},
-            /** Constructor. Registers the key listener that pops up the dialog. */
-            initialize : function($super, interactionParameters) {
-                this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
-                // call constructor from ModalPopup with params content, shortcuts, options
-                $super(
-                    this.createContent(this.interactionParameters),
-                    {
-                        "show"  : { method : this.showDialog,  keys : [] },
-                        "close" : { method : this.closeDialog, keys : ['Esc'] }
-                    },
-                    {
-                        displayCloseButton : true,
-                        verticalPosition : "top",
-                        backgroundColor : "#FFF",
-                        removeOnClose : true
-                    }
+  // New attachment modal
+  var displayPopupNew = function(type) {
+    XWiki.widgets.NewOOFile = Class.create(XWiki.widgets.ModalPopup, {
+      defaultInteractionParameters : {},
+      /** Constructor. Registers the key listener that pops up the dialog. */
+      initialize : function($super, interactionParameters) {
+        this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
+        // call constructor from ModalPopup with params content, shortcuts, options
+        $super(
+          this.createContent(this.interactionParameters),
+          {
+            'show': {method : this.showDialog, keys: []},
+            'close': {method : this.closeDialog, keys: ['Esc']}
+          },
+          {
+            displayCloseButton: true,
+            verticalPosition: 'top',
+            backgroundColor: '#FFF',
+            removeOnClose: true
+          }
+        );
+        this.showDialog();
+        this.setClass('my-modal-popup');
+      },
+      /** Get the content of the modal dialog using ajax */
+      createContent : function(data) {
+        var content = new Element('div', {'class': 'modal-popup'});
+        var newLine = new Element('br');
+        var errorP = new Element('p', {'id': 'oONewFileError'});
+        var fileType = '.docx';
+        var buttonType = 'btn-primary btn-ootext';
+        if (type === 'spreadsheet') {
+          fileType = '.xlsx';
+          buttonType = 'btn-success btn-oosheet';
+        } else if (type === 'presentation') {
+          fileType = '.pptx';
+          buttonType = 'btn-warning btn-ooprez';
+        }
+        var defaultName = getDefaultName(fileType);
+        var nameInput = new Element('input', {'size': 30, 'type': 'text', 'id': 'oONewFileName', 'placeholder': defaultName});
+
+        var validButton = new Element('button', {'class': 'btn ' + buttonType});
+        validButton.insert('Create ' + capitalizeFirstLetter(type));
+          $(validButton).on('click', function() {
+            var name = $('#oONewFileName').val().trim();
+            if (name === '') {
+              name = defaultName;
+            } else {
+              var list = getExistingNames();
+              if (list.indexOf(name + fileType) !== -1) {
+                $('#oONewFileError').text(
+                  'An attachment with that name ( ' + name + fileType + ' ) ' +
+                  'already exists. Please choose another name.'
                 );
-                this.showDialog();
-                this.setClass("my-modal-popup");
-            },
-            /** Get the content of the modal dialog using ajax */
-            createContent : function (data) {
-                var content = new Element('div', {'class': 'modal-popup'});
-                var newLine = new Element('br');
-                var errorP = new Element('p', {'id': 'oONewFileError'});
-                var fileType = '.docx';
-                var buttonType = 'btn-primary btn-ootext';
-                if (type === "spreadsheet") {
-                    fileType = '.xlsx';
-                    buttonType = 'btn-success btn-oosheet';
-                } else if (type === "presentation") {
-                    fileType = '.pptx';
-                    buttonType = 'btn-warning btn-ooprez';
-                }
-                var defaultName = getDefaultName(fileType);
-                var nameInput = new Element('input', {'size': 30, 'type': 'text', 'id': 'oONewFileName', 'placeholder': defaultName});
-
-                var validButton = new Element('button', {'class': 'btn ' + buttonType});
-                validButton.insert("Create " + capitalizeFirstLetter(type));
-                jQuery(validButton).on('click', function () {
-                    var name = jQuery("#oONewFileName").val().trim();
-                    if (name === "") { name = defaultName; }
-                    else {
-                        var list = getExistingNames();
-                        if (list.indexOf(name + fileType) !== -1) {
-                            jQuery('#oONewFileError').text(
-                                'An attachment with that name ( ' + name + fileType + ' ) ' +
-                                'already exists. Please choose another name.'
-                            );
-                            return;
-                        }
-                    }
-                    var href = rootURL +
-                        'view/XWikiOnlyOfficeCode/XooEdit?xpage=plain&amp;' +
-                        'document=' + encodeURIComponent(fullName) + '&amp;' +
-                        'filename=' + encodeURIComponent(name+fileType) + '&amp;' +
-                        'new=1';
-                    window.location.href = href;
-                });
-                content.insert("Name of the " + type);
-                content.insert(newLine);
-                content.insert(nameInput);
-                content.insert(fileType);
-                content.insert(errorP);
-                content.insert(validButton);
-                return content;
+                return;
+              }
             }
-        });
-        new XWiki.widgets.NewOOFile();
-    };
+            var href = rootURL +
+              'view/XWikiOnlyOfficeCode/XooEdit?xpage=plain&amp;' +
+              'document=' + encodeURIComponent(fullName) + '&amp;' +
+              'filename=' + encodeURIComponent(name+fileType) + '&amp;' +
+              'new=1';
+            window.location.href = href;
+          });
+        content.insert('Name of the ' + type);
+        content.insert(newLine);
+        content.insert(nameInput);
+        content.insert(fileType);
+        content.insert(errorP);
+        content.insert(validButton);
+        return content;
+      }
+    });
+    new XWiki.widgets.NewOOFile();
+  };
 
-    var decorateWithXooButtons = function () {
-        var hasEditRights = XWiki.hasEdit;
-        var canDoByExt = { };
-        ["docx", "xlsx", "pptx"].forEach(function (x) { canDoByExt[x] = "edit"; });
-        [
-            "xls", "ods", "csv", "doc", "odt", "ppt", "pps",
-            "odp", "ppsx", "rtf", "txt", "mht", "html", "htm"
-        ].forEach(function (x) { canDoByExt[x] = "convert"; });
-        ["pdf", "djvu", "fb2", "epub", "xps"].forEach(function (x) { canDoByExt[x] = "view"; });
+  var decorateWithXooButtons = function() {
+    var hasEditRights = XWiki.hasEdit;
+    var canDoByExt = { };
 
-        jQuery("#_attachments span.name").each(function (i, elem) {
-            if(jQuery(elem.parentNode).find("div.xwikibuttonlinks &gt; a.oOEdit").length) { return; }
-            var fileName = jQuery(elem).find('a').text().trim();
-            var fileType = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase();
-            var whatCanDo = canDoByExt[fileType];
-            if (!whatCanDo) { return; }
-            if (!hasEditRights) { whatCanDo = "view"; }
+    ['docx', 'xlsx', 'pptx'].forEach(function(x) {
+      canDoByExt[x] = 'edit';
+    });
+    ['xls', 'ods', 'csv', 'doc', 'odt', 'ppt', 'pps', 'odp', 'ppsx', 'rtf', 'txt', 'mht', 'html', 'htm'].forEach(function(x) {
+      canDoByExt[x] = 'convert';
+    });
+    ['pdf', 'djvu', 'fb2', 'epub', 'xps'].forEach(function(x) {
+      canDoByExt[x] = 'view';
+    });
 
-            var logoURL = rootURL + 'download/XWikiOnlyOfficeCode/XooEdit/' + ICONS[whatCanDo];
-            var label = MESSAGES[whatCanDo];
-            jQuery(
-                '&lt;div class="btn-group xwikibuttonlinks oobutton" style="padding-left: 5px;"&gt;' +
-                    '&lt;a class="oOEdit" href= "' + rootURL +
-                        'view/XWikiOnlyOfficeCode/XooEdit?xpage=plain&amp;amp;' +
-                        'document=' + encodeURIComponent(fullName) + '&amp;amp;' +
-                        'filename=' + encodeURIComponent(fileName) + '" ' +
-                        'title="' + label + '" class="viewlink btn btn-xs btn-default"' +
-                    '&gt;' +
-                        '&lt;span class="glyphicon"&gt;' +
-                            '&lt;img src="' + logoURL + '"&gt;' +
-                        '&lt;/span&gt;' +
-                    '&lt;/a&gt;' +
-                '&lt;/div&gt;'
-            ).insertBefore(elem);
-        });
+    $("#_attachments span.name").each(function(i, elem) {
+      if ($(elem.parentNode).find('div.xwikibuttonlinks &gt; a.oOEdit').length) {
+        return;
+      }
+      var fileName = $(elem).find('a').text().trim();
+      var fileType = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase();
+      var whatCanDo = canDoByExt[fileType];
+      if (!whatCanDo) {
+        return;
+      }
+      if (!hasEditRights) {
+        whatCanDo = 'view';
+      }
 
-        if (!enableCreation) { return; }
-        if (jQuery('#oOCreateButtons').length) { return; }
-        // Add the buttons
-        jQuery(
-            '&lt;style&gt;' +
-                '.btn-ootext {' +
-                    'background-image: linear-gradient(#5a7dc9,#496cb8 50%,#385ba7);' +
-                    'border-bottom-color: #385ba7;' +
-                    'border: 1px solid #5477c3;' +
-                    'background-color: #385ba7;' +
-                '}' +
-                '.btn-ootext:hover {' +
-                    'background-image: linear-gradient(#496cb8,#385ba7 50%,#274a96);' +
-                    'border-bottom-color: #274a96;' +
-                    'border: 1px solid #4366b2;' +
-                    'background-color: #274a96;' +
-                '}' +
-                 '.btn-oosheet {' +
-                    'background-image: linear-gradient(#8ca946,#7b9835 50%,#6a8724);' +
-                    'border-bottom-color: #6a8724;' +
-                    'border: 1px solid #86a340;' +
-                    'background-color: #6a8724;' +
-                '}' +
-                '.btn-oosheet:hover {' +
-                    'background-image: linear-gradient(#7b9835,#6a8724 50%,#507613);' +
-                    'border-bottom-color: #5076a3;' +
-                    'border: 1px solid #759229;' +
-                    'background-color: #8076a3;' +
-                '}' +
-                 '.btn-ooprez {' +
-                    'background-image: linear-gradient(#dd682b,#cc571a 50%,#bb4809);' +
-                    'border-bottom-color: #bb4809;' +
-                    'border: 1px solid #d56223;' +
-                    'background-color: #bb4809;' +
-                '}' +
-                '.btn-ooprez:hover {' +
-                    'background-image: linear-gradient(#cc571a,#bb4809 50%,#aa3702);' +
-                    'border-bottom-color: #aa3702;' +
-                    'border: 1px solid #c45015;' +
-                    'background-color: #aa3702;' +
-                '}' +
-            '&lt;/style&gt;' +
-            '&lt;div id="oOCreateButtons"&gt;' +
-                '&lt;input type="button" class="btn btn-primary btn-ootext oONewText" value="New Document" /&gt; ' +
-                '&lt;input type="button" class="btn btn-success btn-oosheet oONewSpreadsheet" value="New Spreadsheet" /&gt; ' +
-                '&lt;input type="button" class="btn btn-warning btn-ooprez oONewPresentation" value="New Presentation" /&gt;' +
-            '&lt;/div&gt;'
-        ).appendTo('#attachmentscontent');
+      var logoURL = rootURL + 'download/XWikiOnlyOfficeCode/XooEdit/' + ICONS[whatCanDo];
+      var label = MESSAGES[whatCanDo];
+      $(
+        '&lt;div class="btn-group xwikibuttonlinks oobutton"&gt;' +
+          '&lt;a class="oOEdit" href= "' + rootURL +
+            'view/XWikiOnlyOfficeCode/XooEdit?xpage=plain&amp;amp;' +
+            'document=' + encodeURIComponent(fullName) + '&amp;amp;' +
+            'filename=' + encodeURIComponent(fileName) + '" ' +
+            'title="' + label + '" class="viewlink btn btn-xs btn-default"' +
+          '&gt;' +
+            '&lt;span class="glyphicon"&gt;' +
+              '&lt;img src="' + logoURL + '"&gt;' +
+            '&lt;/span&gt;' +
+          '&lt;/a&gt;' +
+        '&lt;/div&gt;'
+      ).insertBefore(elem);
+    });
 
-        // Button events
-        jQuery('.oONewText').on('click', function () {
-            displayPopupNew('document');
-        });
-        jQuery('.oONewSpreadsheet').on('click', function () {
-            displayPopupNew('spreadsheet');
-        });
-        jQuery('.oONewPresentation').on('click', function () {
-            displayPopupNew('presentation');
-        });
-    };
+    if (!enableCreation) {
+      return;
+    }
+    if ($('#oOCreateButtons').length) {
+      return;
+    }
+    // Add the buttons
+    $(
+      '&lt;div id="oOCreateButtons"&gt;' +
+        '&lt;input type="button" class="btn btn-primary btn-ootext oONewText" value="New Document" /&gt; ' +
+        '&lt;input type="button" class="btn btn-success btn-oosheet oONewSpreadsheet" value="New Spreadsheet" /&gt; ' +
+        '&lt;input type="button" class="btn btn-warning btn-ooprez oONewPresentation" value="New Presentation" /&gt;' +
+      '&lt;/div&gt;'
+    ).appendTo('#attachmentscontent');
 
-    jQuery(decorateWithXooButtons);
-    jQuery(document).on('xwiki:html5upload:fileFinished', decorateWithXooButtons);
-    jQuery(document).on('xwiki:docextra:loaded', decorateWithXooButtons);
-});
-</code>
+    // Button events
+    $('.oONewText').on('click', function() {
+        displayPopupNew('document');
+    });
+    $('.oONewSpreadsheet').on('click', function() {
+        displayPopupNew('spreadsheet');
+    });
+    $('.oONewPresentation').on('click', function() {
+        displayPopupNew('presentation');
+    });
+  };
+
+  $(decorateWithXooButtons);
+  $(document).on('xwiki:html5upload:fileFinished', decorateWithXooButtons);
+  $(document).on('xwiki:docextra:loaded', decorateWithXooButtons);
+});</code>
     </property>
     <property>
       <name/>
@@ -747,12 +727,13 @@ require(['jquery', 'xwiki-meta'],function(jQuery, Meta) {
       <cache>long</cache>
     </property>
     <property>
-      <code>/* Code to fix the design of the only office iframe */
-html {
+      <code>/* Code to fix the design of the only office iframe.
+ * Added the "ooFrame" id to the html element in order to isolate these rules from the XWiki ones. */
+html#ooFrame {
   height: 100%;
   width: 100%;
 }
-body {
+#ooFrame body {
   background: #fff;
   color: #333;
   font-family: Arial, Tahoma,sans-serif;
@@ -772,34 +753,34 @@ body {
   display: flex;
   flex-flow: column;
 }
-.saveBarTable {
+#ooFrame .saveBarTable {
   margin-bottom: 0px
 }
-.saveBarTable td {
+#ooFrame .saveBarTable td {
   padding: 4px;
   padding-left: 13px;
 }
-.saveBar img {
+#ooFrame .saveBar img {
   max-width: 6em;
   max-height: 3em;
 }
-.form {
+#ooFrame .form {
   -webkit-flex: 1;
   -moz-flex: 1;
   flex: 1;
   position: relative;
 }
-.form &gt; iframe {
+#ooFrame .form &gt; iframe {
   position:absolute;
 }
-#iframeEditor {
+#ooFrame #iframeEditor {
   position: relative;
   top: 30%;
   text-align: center;
   font-weight: bold;
   font-style: italic;
 }
-div {
+#ooFrame div {
   margin: 0;
   padding: 0;
 }</code>
@@ -808,13 +789,153 @@ div {
       <contentType>CSS</contentType>
     </property>
     <property>
-      <name>xwiki-onlyoffice.css</name>
+      <name>Code for Only Office frame (xwiki-onlyoffice.css)</name>
     </property>
     <property>
       <parse/>
     </property>
     <property>
-      <use>onDemand</use>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>XWikiOnlyOfficeCode.XooEdit</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>df6c2cc1-bcd3-45a5-81e1-19f32627ea49</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.btn-ootext {
+  background-image: linear-gradient(#5a7dc9,#496cb8 50%,#385ba7);
+  border: 1px solid #5477c3;
+}
+.btn-ootext:hover {
+  background-image: linear-gradient(#496cb8,#385ba7 50%,#274a96);
+  border: 1px solid #4366b2;
+}
+.btn-oosheet {
+  background-image: linear-gradient(#8ca946,#7b9835 50%,#6a8724);
+  border: 1px solid #86a340;
+}
+.btn-oosheet:hover {
+  background-image: linear-gradient(#7b9835,#6a8724 50%,#507613);
+  border: 1px solid #759229;
+}
+.btn-ooprez {
+  background-image: linear-gradient(#dd682b,#cc571a 50%,#bb4809);
+  border: 1px solid #d56223;
+}
+.btn-ooprez:hover {
+  background-image: linear-gradient(#cc571a,#bb4809 50%,#aa3702);
+  border: 1px solid #c45015;
+}
+
+.oobutton {
+  padding-left: 5px;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>General extension code</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>always</use>
     </property>
   </object>
 </xwikidoc>
