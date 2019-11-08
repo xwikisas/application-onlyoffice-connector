@@ -70,8 +70,19 @@
       &lt;img src="$logoURL"/&gt;
     &lt;/a&gt;
   &lt;/div&gt;
+#elseif ($request.elem == 'modalContent')
+  #set ($attachmentName = "${request.defaultName}${request.fileType}")
+  &lt;div class="modal-popup"&gt;
+    $services.localization.render("xoo.creationModal.${request.type}.title")
+    &lt;input size="30" type="text" id="oONewFileName" placeholder="$escapetool.xml($request.defaultName)"&gt;$request.fileType
+    &lt;p class="hidden box errormessage" id="oONewFileError"&gt;
+      $services.localization.render('xoo.validation.attachmentExists', [$attachmentName])
+    &lt;/p&gt;
+    &lt;button class="btn btn-success $request.buttonType"&gt;
+      $services.localization.render("xoo.creationModal.${request.type}.creationButton")
+    &lt;/button&gt;
+  &lt;/div&gt;
 #end
 {{/html}}
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

@@ -480,10 +480,7 @@ require(['jquery'],function($) {
         this.setClass('my-modal-popup');
       },
       /** Get the content of the modal dialog using ajax */
-      createContent : function(data) {
-        var content = new Element('div', {'class': 'modal-popup'});
-        var newLine = new Element('br');
-        var errorP = new Element('p', {'id': 'oONewFileError'});
+      createContent : function() {
         var fileType = '.docx';
         var buttonType = 'btn-primary btn-ootext';
         if (type === 'spreadsheet') {
@@ -494,41 +491,37 @@ require(['jquery'],function($) {
           buttonType = 'btn-warning btn-ooprez';
         }
         var defaultName = getDefaultName(fileType);
-        var nameInput = new Element('input', {'size': 30, 'type': 'text', 'id': 'oONewFileName', 'placeholder': defaultName});
 
-        var validButton = new Element('button', {'class': 'btn ' + buttonType});
-        validButton.insert('Create ' + capitalizeFirstLetter(type));
-          $(validButton).on('click', function() {
+        var queryString = $.param({
+          'elem': 'modalContent',
+          'type': type,
+          'fileType': fileType,
+          'buttonType': buttonType,
+          'defaultName': defaultName
+        });
+        $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get', queryString), function(data) {
+          $('.xdialog-content').html(data);
+        }).done(function() {
+          $('.modal-popup').on('click', 'button', function() {
             var name = $('#oONewFileName').val().trim();
             if (name === '') {
               name = defaultName;
-            } else {
-              var list = getExistingNames();
-              if (list.indexOf(name + fileType) !== -1) {
-                $('#oONewFileError').text(
-                  'An attachment with that name ( ' + name + fileType + ' ) ' +
-                  'already exists. Please choose another name.'
-                );
-                return;
-              }
             }
-            var fileName = name + fileType;
-            var queryString = $.param({
-              'document': fullName,
-              'filename': fileName,
-              'new': 1,
-              'xpage': 'plain'
-            });
-            var href = new XWiki.Document('XooEdit', 'XWikiOnlyOfficeCode').getURL('view', queryString)
-            window.location.href = href;
+            if (getExistingNames().indexOf(name + fileType) !== -1) {
+              $('#oONewFileError').toggleClass('hidden');
+            } else {
+              var fileName = name + fileType;
+              var queryString = $.param({
+                'document': fullName,
+                'filename': fileName,
+                'new': 1,
+                'xpage': 'plain'
+              });
+              var href = new XWiki.Document('XooEdit', 'XWikiOnlyOfficeCode').getURL('view', queryString)
+              window.location.href = href;
+            }
           });
-        content.insert('Name of the ' + type);
-        content.insert(newLine);
-        content.insert(nameInput);
-        content.insert(fileType);
-        content.insert(errorP);
-        content.insert(validButton);
-        return content;
+        });
       }
     });
     new XWiki.widgets.NewOOFile();
@@ -571,7 +564,7 @@ require(['jquery'],function($) {
 
       $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get', queryString), function(data) {
         $(data).insertBefore(elem);
-      })
+      });
     });
 
     if (!enableCreation) {

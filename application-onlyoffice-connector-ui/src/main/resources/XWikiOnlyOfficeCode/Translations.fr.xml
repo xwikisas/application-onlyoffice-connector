@@ -39,12 +39,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-xoo.error.noValidLicense=Il n'y a pas de licence valide pour l'application OnlyOffice Connector. Pour en obtenir une, merci de visiter {0}Licenses section{1}.
+  <content>xoo.error.noValidLicense=Il n'y a pas de licence valide pour l'application OnlyOffice Connector. Pour en obtenir une, merci de visiter {0}Licenses section{1}.
 xoo.extension.name=Application OnlyOffice Connector
 xoo.creationButtons.prez.label=Nouvelle Présentation
 xoo.creationButtons.sheet.label=Nouvelle Feuille de calcul
 xoo.creationButtons.text.label=Nouveau Document
+xoo.creationModal.presentation.title=Nom de la présentation
+xoo.creationModal.presentation.inputPlaceholder=Présentation
+xoo.creationModal.presentation.creationButton=Créer une Présentation
+xoo.creationModal.spreadsheet.title=Nom de la feuille de calcul
+xoo.creationModal.spreadsheet.inputPlaceholder=Feuille de calcul
+xoo.creationModal.spreadsheet.creationButton=Créer une Feuille de calcul
+xoo.creationModal.document.title=Nom du document
+xoo.creationModal.document.inputPlaceholder=Document
+xoo.creationModal.document.creationButton=Créer un Document
 xoo.attachments.actions.convert=Voir/Convertir avec OnlyOffice
 xoo.attachments.actions.edit=Modifier avec OnlyOffice
 xoo.attachments.actions.view=Afficher dans OnlyOffice
@@ -54,6 +62,7 @@ xoo.inFrameContent.editConvertibleVersion.title=Ce type de document ({0}) ne peu
 xoo.inFrameContent.editConvertibleVersion.value=Modifier la version {0}
 xoo.inFrameContent.loading=Chargement de OnlyOffice ...
 xoo.inFrameContent.onPage=sur la page
+xoo.validation.attachmentExists=Une pièce jointe portant ce nom ({0}) existe déjà. Veuillez choisir un autre nom.
 xoo.validation.attachmentMissing=Document ou pièce jointe non trouvé !
 xoo.validation.documentMissing=Paramètre de document requis !
 xoo.validation.filenameMissing=Paramètre de nom de fichier requis !</content>
