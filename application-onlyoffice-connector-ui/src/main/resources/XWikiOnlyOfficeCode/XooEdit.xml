@@ -431,10 +431,6 @@ require(['jquery'],function($) {
 
   var fullName = XWiki.Document.currentDocumentReference.toString();
 
-  var capitalizeFirstLetter = function(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-
   var getExistingNames = function() {
     return $('#_attachments span.name a').toArray().map(function(a) {
       return a.innerText;
