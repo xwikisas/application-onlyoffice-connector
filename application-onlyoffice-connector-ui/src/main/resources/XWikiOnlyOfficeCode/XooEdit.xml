@@ -62,11 +62,11 @@
 #set ($EDITABLE_FILETYPES = ['.docx', '.xlsx', '.pptx'])
 ##
 #if ("$!request.document" == '')
-  document parameter required
+  $services.localization.render('xoo.validation.documentMissing')
 #else
   #set ($docu = $xwiki.getDocument($request.document))
   #if ("$!request.filename" == '')
-    filename parameter required
+    $services.localization.render('xoo.validation.filenameMissing')
   #else
     #set ($filename = $request.filename)
     #set ($fileType = $filename.substring($filename.lastIndexOf('.')))
@@ -87,7 +87,7 @@
   #end
 #end
 #if (!$attachment)
-  document or attachment not found
+  $services.localization.render('xoo.validation.attachmentMissing')
 #else
   #set ($mode = 'edit')
   #set ($fileNoType = $filename.substring(0, $filename.lastIndexOf('.')))
@@ -192,7 +192,7 @@
               &lt;td style="vertical-align: middle"&gt;
                 &lt;strong&gt;$currentAction&lt;/strong&gt;
                 &lt;em&gt;$request.filename&lt;/em&gt;
-                on page
+                $services.localization.render('xoo.inFrameContent.onPage')
                 &lt;a href="${docu.URL}#Attachments" title="$services.localization.render('cancel')"&gt;$docu.displayTitle&lt;/a&gt;
               &lt;/td&gt;
               &lt;td style="text-align: right; vertical-align: middle"&gt;
@@ -201,12 +201,14 @@
                     &lt;input id="button-sac" class="btn btn-primary" type="submit" value="$services.localization.render('saveandcontinue')" /&gt;
                     &lt;input id="button-sav" class="btn btn-success" type="submit" value="$services.localization.render('saveandview')" /&gt;
                   #elseif ($mode == 'convExists')
-                    &lt;input id="button-ecv" class="btn btn-success" type="submit" value="Edit $convertableTo version"
-                      title="This document type ($fileType) cannot be edited with OnlyOffice but another attachment &amp;quot;$convFilename&amp;quot; exists, click to edit it."
+                    &lt;input id="button-ecv" class="btn btn-success" type="submit"
+                      value="$services.localization.render('xoo.inFrameContent.editConvertibleVersion.value', [$convertableTo])"
+                      title="$services.localization.render('xoo.inFrameContent.editConvertibleVersion.title', [$fileType, $convFilename])"
                     /&gt;
-                  #elseif ($mode == "convertable")
-                    &lt;input id="button-cnv" class="btn btn-success" type="submit" value="Convert to $convertableTo for editing" data-convertableto="$convertableTo"
-                      title="In order to edit this document it must first be converted to Microsoft Office&amp;#8482; compatible $convertableTo format"
+                  #elseif ($mode == 'convertable')
+                    &lt;input id="button-cnv" class="btn btn-success" type="submit" data-convertableto="$convertableTo"
+                      value="$services.localization.render('xoo.inFrameContent.convertForEditing.value', [$convertableTo])"
+                      title="$services.localization.render('xoo.inFrameContent.convertForEditing.title', [$convertableTo])"
                     /&gt;
                   #end
                   &lt;input id="button-cancel" class="btn btn-default" type="submit" name="action_cancel" value="$services.localization.render('cancel')" data-redirect-to="${docu.URL}#Attachments" /&gt;
@@ -219,7 +221,7 @@
       &lt;div class="form"&gt;
         &lt;div id="iframeEditor"&gt;
           &lt;p&gt;
-            Loading OnlyOffice... &lt;img src="$xwiki.getSkinFile('resources/icons/xwiki/spinner.gif', true)" /&gt;
+            $services.localization.render('xoo.inFrameContent.loading')&lt;img src="$xwiki.getSkinFile('resources/icons/xwiki/spinner.gif', true)" /&gt;
           &lt;/p&gt;
         &lt;/div&gt;
       &lt;/div&gt;

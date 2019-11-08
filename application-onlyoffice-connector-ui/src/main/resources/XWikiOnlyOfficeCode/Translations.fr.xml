@@ -46,6 +46,15 @@ xoo.creationButtons.prez.label=Nouvelle Présentation
 xoo.creationButtons.sheet.label=Nouvelle Feuille de calcul
 xoo.creationButtons.text.label=Nouveau Document
 xoo.attachments.actions.convert=Voir/Convertir avec OnlyOffice
-xoo.attachments.actions.edit=Modifier avec OnlyOffce
-xoo.attachments.actions.view=Afficher dans OnlyOffice</content>
+xoo.attachments.actions.edit=Modifier avec OnlyOffice
+xoo.attachments.actions.view=Afficher dans OnlyOffice
+xoo.inFrameContent.convertForEditing.title=Pour pouvoir éditer ce document, il doit d''abord être converti au format {0} compatible avec Microsoft Office&amp;#8482;.
+xoo.inFrameContent.convertForEditing.value=Convertir en {0} pour l'édition
+xoo.inFrameContent.editConvertibleVersion.title=Ce type de document ({0}) ne peut pas être modifié avec OnlyOffice, mais une autre pièce jointe ({1}) existe. Cliquez pour le modifier.
+xoo.inFrameContent.editConvertibleVersion.value=Modifier la version {0}
+xoo.inFrameContent.loading=Chargement de OnlyOffice ...
+xoo.inFrameContent.onPage=sur la page
+xoo.validation.attachmentMissing=Document ou pièce jointe non trouvé !
+xoo.validation.documentMissing=Paramètre de document requis !
+xoo.validation.filenameMissing=Paramètre de nom de fichier requis !</content>
 </xwikidoc>
