@@ -438,7 +438,6 @@ require(['jquery', 'xwiki-meta'],function($, Meta) {
     convert: 'onlyOffice-logo-blue.png'
   };
 
-  var rootURL = XWiki.contextPath + '/' + XWiki.servletpath;
   var fullName = XWiki.Document.currentDocumentReference.toString();
 
   var capitalizeFirstLetter = function(string) {
@@ -522,11 +521,9 @@ require(['jquery', 'xwiki-meta'],function($, Meta) {
                 return;
               }
             }
-            var href = rootURL +
-              'view/XWikiOnlyOfficeCode/XooEdit?xpage=plain&amp;' +
-              'document=' + encodeURIComponent(fullName) + '&amp;' +
-              'filename=' + encodeURIComponent(name+fileType) + '&amp;' +
-              'new=1';
+            var queryString = 'xpage=plain&amp;new=1&amp;document=' + encodeURIComponent(fullName) +
+                              '&amp;filename=' + encodeURIComponent(name+fileType);
+            var href = new XWiki.Document('XooEdit', 'XWikiOnlyOfficeCode').getURL('view', queryString)
             window.location.href = href;
           });
         content.insert('Name of the ' + type);
@@ -569,14 +566,14 @@ require(['jquery', 'xwiki-meta'],function($, Meta) {
         whatCanDo = 'view';
       }
 
-      var logoURL = rootURL + 'download/XWikiOnlyOfficeCode/XooEdit/' + ICONS[whatCanDo];
+      var queryString = 'xpage=plain&amp;document=' + encodeURIComponent(fullName) +
+                        '&amp;filename=' + encodeURIComponent(fileName);
+      var actionURL = new XWiki.Document('XooEdit', 'XWikiOnlyOfficeCode').getURL('view', queryString)
+      var logoURL = new XWiki.Document('XooEdit', 'XWikiOnlyOfficeCode').getURL('download') +'/' + ICONS[whatCanDo];
       var label = MESSAGES[whatCanDo];
       $(
         '&lt;div class="btn-group xwikibuttonlinks oobutton"&gt;' +
-          '&lt;a class="oOEdit" href= "' + rootURL +
-            'view/XWikiOnlyOfficeCode/XooEdit?xpage=plain&amp;amp;' +
-            'document=' + encodeURIComponent(fullName) + '&amp;amp;' +
-            'filename=' + encodeURIComponent(fileName) + '" ' +
+          '&lt;a class="oOEdit" href="' + actionURL + '" ' +
             'title="' + label + '" class="viewlink btn btn-xs btn-default"' +
           '&gt;' +
             '&lt;span class="glyphicon"&gt;' +
