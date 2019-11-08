@@ -42,7 +42,10 @@
   <content>xoo.extension.name=OnlyOffice Connector Application
 xoo.creationButtons.prez.label=New Presentation
 xoo.creationButtons.sheet.label=New Spreadsheet
-xoo.creationButtons.text.label=New Document</content>
+xoo.creationButtons.text.label=New Document
+xoo.attachments.actions.convert=View/Convert with OnlyOffice
+xoo.attachments.actions.edit=Edit with OnlyOffice
+xoo.attachments.actions.view=View in OnlyOffice</content>
   <object>
     <name>XWikiOnlyOfficeCode.Translations</name>
     <number>0</number>

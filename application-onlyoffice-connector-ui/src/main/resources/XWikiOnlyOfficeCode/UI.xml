@@ -41,14 +41,36 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 {{html}}
-&lt;div id="oOCreateButtons"&gt;
-  &lt;input type="button" class="btn btn-primary btn-ootext oONewText"
-    value="$services.localization.render('xoo.creationButtons.text.label')" /&gt;
-  &lt;input type="button" class="btn btn-success btn-oosheet oONewSpreadsheet"
-    value="$services.localization.render('xoo.creationButtons.sheet.label')" /&gt;
-  &lt;input type="button" class="btn btn-warning btn-ooprez oONewPresentation"
-    value="$services.localization.render('xoo.creationButtons.prez.label')" /&gt;
-&lt;/div&gt;
+#if ($request.elem == 'oOCreateButtons')
+  &lt;div id="oOCreateButtons"&gt;
+    &lt;input type="button" class="btn btn-primary btn-ootext oONewText"
+      value="$services.localization.render('xoo.creationButtons.text.label')" /&gt;
+    &lt;input type="button" class="btn btn-success btn-oosheet oONewSpreadsheet"
+      value="$services.localization.render('xoo.creationButtons.sheet.label')" /&gt;
+    &lt;input type="button" class="btn btn-warning btn-ooprez oONewPresentation"
+      value="$services.localization.render('xoo.creationButtons.prez.label')" /&gt;
+  &lt;/div&gt;
+#elseif ($request.elem == 'oOActionButtons')
+  #set ($icons = {
+    'convert': 'onlyOffice-logo-blue.png',
+    'edit': 'onlyOffice-logo.png',
+    'view': 'onlyOffice-logo-grey.png'
+  })
+  #set ($mainDoc = $xwiki.getDocument('XWikiOnlyOfficeCode.XooEdit'))
+  #set ($logoURL = $mainDoc.getAttachmentURL($icons.get($request.whatCanDo)))
+  #set ($queryString = $escapetool.url({
+    'filename': $request.filename,
+    'document': $request.document,
+    'xpage': 'plain'
+  }))
+  #set ($actionURL = $mainDoc.getURL('view', $queryString))
+  #set ($title = $services.localization.render("xoo.attachments.actions.${request.whatCanDo}"))
+  &lt;div class="btn-group xwikibuttonlinks oobutton"&gt;
+    &lt;a class="oOEdit btn btn-xs btn-default" href="$actionURL" title="$title"&gt;
+      &lt;img src="$logoURL"/&gt;
+    &lt;/a&gt;
+  &lt;/div&gt;
+#end
 {{/html}}
 {{/velocity}}
 </content>

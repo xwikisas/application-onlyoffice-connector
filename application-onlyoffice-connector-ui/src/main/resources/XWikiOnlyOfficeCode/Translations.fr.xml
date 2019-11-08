@@ -44,5 +44,8 @@ xoo.error.noValidLicense=Il n'y a pas de licence valide pour l'application OnlyO
 xoo.extension.name=Application OnlyOffice Connector
 xoo.creationButtons.prez.label=Nouvelle Présentation
 xoo.creationButtons.sheet.label=Nouvelle Feuille de calcul
-xoo.creationButtons.text.label=Nouveau Document</content>
+xoo.creationButtons.text.label=Nouveau Document
+xoo.attachments.actions.convert=Voir/Convertir avec OnlyOffice
+xoo.attachments.actions.edit=Modifier avec OnlyOffce
+xoo.attachments.actions.view=Afficher dans OnlyOffice</content>
 </xwikidoc>
