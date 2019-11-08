@@ -590,28 +590,23 @@ require(['jquery', 'xwiki-meta'],function($, Meta) {
     if (!enableCreation) {
       return;
     }
-    if ($('#oOCreateButtons').length) {
-      return;
+    if ($('#oOCreateButtons').length == 0) {
+      // Add the buttons
+      $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get'), function(data) {
+        $('#attachmentscontent').append(data);
+      }).done(function() {
+        // Button events
+        $('#attachmentscontent').on('click', '.oONewText', function() {
+          displayPopupNew('document');
+        });
+        $('#attachmentscontent').on('click', '.oONewSpreadsheet', function() {
+          displayPopupNew('spreadsheet');
+        });
+        $('#attachmentscontent').on('click', '.oONewPresentation', function() {
+          displayPopupNew('presentation');
+        });
+      });
     }
-    // Add the buttons
-    $(
-      '&lt;div id="oOCreateButtons"&gt;' +
-        '&lt;input type="button" class="btn btn-primary btn-ootext oONewText" value="New Document" /&gt; ' +
-        '&lt;input type="button" class="btn btn-success btn-oosheet oONewSpreadsheet" value="New Spreadsheet" /&gt; ' +
-        '&lt;input type="button" class="btn btn-warning btn-ooprez oONewPresentation" value="New Presentation" /&gt;' +
-      '&lt;/div&gt;'
-    ).appendTo('#attachmentscontent');
-
-    // Button events
-    $('.oONewText').on('click', function() {
-        displayPopupNew('document');
-    });
-    $('.oONewSpreadsheet').on('click', function() {
-        displayPopupNew('spreadsheet');
-    });
-    $('.oONewPresentation').on('click', function() {
-        displayPopupNew('presentation');
-    });
   };
 
   $(decorateWithXooButtons);
