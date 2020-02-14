@@ -446,7 +446,7 @@ require(['jquery'],function($) {
       return name;
     }
     while (list.indexOf(name + ' - ' + untitledIndex + fileType) !== -1) {
-      untitledIndex++; 
+      untitledIndex++;
     }
     return name + ' - ' + untitledIndex;
   };
@@ -566,7 +566,8 @@ require(['jquery'],function($) {
     if (!enableCreation) {
       return;
     }
-    if ($('#oOCreateButtons').length == 0) {
+    if (!window.xooCreateButtonInitted) {
+      window.xooCreateButtonInitted = true;
       // Add the buttons
       $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get', 'elem=oOCreateButtons'), function(data) {
         $('#attachmentscontent').append(data);
