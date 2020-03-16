@@ -420,175 +420,233 @@
 #set($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
 #set($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').value)
 #if ("$!OO_USE_GLOBAL_CONFIG" != '0')
-  #set($OO_CONF_REF = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-  #set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-  #set($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
+#set($OO_CONF_REF = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
+#set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
+#set($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
 #end
 // this file is copied into the JSExtension object when producing the XAR
 // it should fire everytime a view page is displayed
 require(['jquery'],function($) {
-  var enableCreation = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == '1';
+    var enableCreation = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == '1';
 
-  var fullName = XWiki.Document.currentDocumentReference.toString();
+    var fullName = XWiki.Document.currentDocumentReference.toString();
 
-  var getExistingNames = function() {
-    return $('#_attachments span.name a').toArray().map(function(a) {
-      return a.innerText;
-    });
-  };
+    #set ($mainDoc = $xwiki.getDocument('XWikiOnlyOfficeCode.XooEdit'));
+    var iconURLs = $jsontool.serialize({
+        'convert': $mainDoc.getAttachmentURL('onlyOffice-logo-blue.png'),
+        'edit':    $mainDoc.getAttachmentURL('onlyOffice-logo.png'),
+        'view':    $mainDoc.getAttachmentURL('onlyOffice-logo-grey.png')});
+    var titles = $jsontool.serialize({
+        'convert': $services.localization.render("xoo.attachments.actions.convert"),
+        'edit':    $services.localization.render("xoo.attachments.actions.edit"),
+        'view':    $services.localization.render("xoo.attachments.actions.view")});
+    var mainDocUrl =  $jsontool.serialize($mainDoc.getURL('view'));
+    var prefix = '?';
+    if(mainDocUrl.indexOf('?')>-1) prefix = '&amp;';
+    var createTrans = {};
+    #foreach($type in ['presentation','spreadsheet','document'])
+    createTrans.$type = {};
+    #foreach($b in ['title','inputPlaceholder', 'creationButton'])
+    createTrans.$type.$b = $jsontool.serialize($services.localization.render("xoo.creationModal.${type}.${b}"));
+    #end
+    #end
 
-  // Create untitled documents when no name is given
-  var getDefaultName = function(fileType) {
-    var untitledIndex = 1;
-    var list = getExistingNames();
-    var name = ({'.xlsx': 'Spreadsheet', '.docx': 'Document', '.pptx': 'Presentation' })[fileType] + ' ' + new Date().toString().split(' ').slice(0,4).join(' ');
-    if (list.indexOf(name + fileType) === -1) {
-      return name;
-    }
-    while (list.indexOf(name + ' - ' + untitledIndex + fileType) !== -1) {
-      untitledIndex++;
-    }
-    return name + ' - ' + untitledIndex;
-  };
+    var getExistingNames = function() {
+        return $('#_attachments span.name a').toArray().map(function(a) {
+            return a.innerText;
+        });
+    };
 
-  // New attachment modal
-  var displayPopupNew = function(type) {
-    XWiki.widgets.NewOOFile = Class.create(XWiki.widgets.ModalPopup, {
-      defaultInteractionParameters : {},
-      /** Constructor. Registers the key listener that pops up the dialog. */
-      initialize : function($super, interactionParameters) {
-        this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
-        // call constructor from ModalPopup with params content, shortcuts, options
-        $super(
-          this.createContent(this.interactionParameters),
-          {
-            'show': {method : this.showDialog, keys: []},
-            'close': {method : this.closeDialog, keys: ['Esc']}
-          },
-          {
-            displayCloseButton: true,
-            verticalPosition: 'top',
-            backgroundColor: '#FFF',
-            removeOnClose: true
-          }
-        );
-        this.showDialog();
-        this.setClass('my-modal-popup');
-      },
-      /** Get the content of the modal dialog using ajax */
-      createContent : function() {
-        var fileType = '.docx';
-        var buttonType = 'btn-primary btn-ootext';
-        if (type === 'spreadsheet') {
-          fileType = '.xlsx';
-          buttonType = 'btn-success btn-oosheet';
-        } else if (type === 'presentation') {
-          fileType = '.pptx';
-          buttonType = 'btn-warning btn-ooprez';
+    // Create untitled documents when no name is given
+    var getDefaultName = function(fileType) {
+        var untitledIndex = 1;
+        var list = getExistingNames();
+        var name = ({'.xlsx': 'Spreadsheet', '.docx': 'Document', '.pptx': 'Presentation' })[fileType] + ' ' + new Date().toString().split(' ').slice(0,4).join(' ');
+        if (list.indexOf(name + fileType) === -1) {
+            return name;
         }
-        var defaultName = getDefaultName(fileType);
+        while (list.indexOf(name + ' - ' + untitledIndex + fileType) !== -1) {
+            untitledIndex++;
+        }
+        return name + ' - ' + untitledIndex;
+    };
 
-        var queryString = $.param({
-          'elem': 'modalContent',
-          'type': type,
-          'fileType': fileType,
-          'buttonType': buttonType,
-          'defaultName': defaultName
-        });
-        $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get', queryString), function(data) {
-          $('.xdialog-content').html(data);
-        }).done(function() {
-          $('.modal-popup').on('click', 'button', function() {
-            var name = $('#oONewFileName').val().trim();
-            if (name === '') {
-              name = defaultName;
-            }
-            if (getExistingNames().indexOf(name + fileType) !== -1) {
-              $('#oONewFileError').toggleClass('hidden');
-            } else {
-              var fileName = name + fileType;
-              var queryString = $.param({
-                'document': fullName,
-                'filename': fileName,
-                'new': 1,
-                'xpage': 'plain'
-              });
-              var href = new XWiki.Document('XooEdit', 'XWikiOnlyOfficeCode').getURL('view', queryString)
-              window.location.href = href;
-            }
-          });
-        });
-      }
-    });
-    new XWiki.widgets.NewOOFile();
-  };
+    // New attachment modal
+    var input = null;
+    var displayPopupNew = function(type) {
+        XWiki.widgets.NewOOFile = Class.create(XWiki.widgets.ModalPopup, {
+            defaultInteractionParameters : {},
+            /** Constructor. Registers the key listener that pops up the dialog. */
+            initialize : function($super, interactionParameters) {
+                this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
+                // call constructor from ModalPopup with params content, shortcuts, options
+                $super(
+                    this.createContent(this.interactionParameters),
+                    {
+                        'show': {method : this.showDialog, keys: []},
+                        'close': {method : this.closeDialog, keys: ['Esc']}
+                    },
+                    {
+                        displayCloseButton: true,
+                        verticalPosition: 'top',
+                        backgroundColor: '#FFF',
+                        removeOnClose: true
+                    }
+                );
+                this.showDialog();
+                this.setClass('my-modal-popup');
+            },
+            createContent : function() {
+                var fileType = '.docx';
+                var buttonType = 'btn-primary btn-ootext';
+                if (type === 'spreadsheet') {
+                    fileType = '.xlsx';
+                    buttonType = 'btn-success btn-oosheet';
+                } else if (type === 'presentation') {
+                    fileType = '.pptx';
+                    buttonType = 'btn-warning btn-ooprez';
+                }
+                var defaultName = getDefaultName(fileType);
+                var attachmentName = defaultName + fileType;
+                var dialogContent = document.createElement("div");
+                dialogContent.setAttribute("class", "modal-popup");
+                dialogContent.innerText = createTrans[type]['title'];
+                input = document.createElement("input");
+                input.setAttribute("size","30");
+                input.setAttribute("type", "text");
+                input.setAttribute("id", "oONewFileName");
+                input.setAttribute("placeholder", createTrans[type][defaultName]);
+                dialogContent.appendChild(input);
+                dialogContent.append(document.createTextNode(fileType));
+                var p = document.createElement("p");
+                p.setAttribute("class", "hidden box errormessage");
+                p.setAttribute("id", "oONewFileError");
+                dialogContent.appendChild(p);
+                var button = document.createElement("button");
+                button.setAttribute("class", "btn btn-success " + buttonType);
 
-  var decorateWithXooButtons = function() {
-    var hasEditRights = XWiki.hasEdit;
+                button.innerText = createTrans[type]["creationButton"];
+                button.onclick = function() {
+                    var name = $('#oONewFileName').val().trim();
+                    if (name === '') {
+                        name = defaultName;
+                    }
+                    if (getExistingNames().indexOf(name + fileType) !== -1) {
+                        $('#oONewFileError').toggleClass('hidden');
+                    } else {
+                        var fileName = name + fileType;
+                        var queryString = $.param({
+                            'document': fullName,
+                            'filename': fileName,
+                            'new': 1,
+                            'xpage': 'plain'
+                        });
+                        var href = new XWiki.Document('XooEdit', 'XWikiOnlyOfficeCode').getURL('view', queryString)
+                        window.location.href = href;
+                    }
+                };
+                dialogContent.appendChild(button);
+
+
+                return dialogContent;
+            }
+        });
+        window.w = new XWiki.widgets.NewOOFile();
+    };
+
+
     var canDoByExt = { };
 
     ['docx', 'xlsx', 'pptx'].forEach(function(x) {
-      canDoByExt[x] = 'edit';
+        canDoByExt[x] = 'edit';
     });
     ['xls', 'ods', 'csv', 'doc', 'odt', 'ppt', 'pps', 'odp', 'ppsx', 'rtf', 'txt', 'mht', 'html', 'htm'].forEach(function(x) {
-      canDoByExt[x] = 'convert';
+        canDoByExt[x] = 'convert';
     });
     ['pdf', 'djvu', 'fb2', 'epub', 'xps'].forEach(function(x) {
-      canDoByExt[x] = 'view';
+        canDoByExt[x] = 'view';
     });
 
-    $("#_attachments span.name").each(function(i, elem) {
-      if ($(elem.parentNode).find('div.xwikibuttonlinks &gt; a.oOEdit').length) {
-        return;
-      }
-      var fileName = $(elem).find('a').text().trim();
-      var fileType = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase();
-      var whatCanDo = canDoByExt[fileType];
-      if (!whatCanDo) {
-        return;
-      }
-      if (!hasEditRights) {
-        whatCanDo = 'view';
-      }
+    var decorateWithXooButtons = function() {
+        var hasEditRights = XWiki.hasEdit;
 
-      var queryString = $.param({
-        'elem': 'oOActionButtons',
-        'document': fullName,
-        'filename': fileName,
-        'whatCanDo': whatCanDo
-      });
+        $("#_attachments span.name").each(function(index, elem) {
+            if ($(elem.parentNode).find('div.xwikibuttonlinks > a.oOEdit').length) {
+                return;
+            }
+            var fileName = $(elem).find('a').text().trim();
+            var fileType = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase();
+            var whatCanDo = canDoByExt[fileType];
+            if (!whatCanDo) {
+                return;
+            }
+            if (!hasEditRights) {
+                whatCanDo = 'view';
+            }
 
-      $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get', queryString), function(data) {
-        $(data).insertBefore(elem);
-      });
-    });
+            // input: whatCanDo, filename, document
+            var queryString = $.param({
+                'filename': fileName,
+                'document':  fullName,
+                'xpage': 'plain'
+            });
+            var actionUrl = mainDocUrl + prefix + queryString;
+            var div = document.createElement("div");
+            div.setAttribute("class", "btn-group xwikibuttonlinks oobutton");
+            var e = document.createElement("a");
+            e.setAttribute("class", "oOEdit btn btn-xs btn-default");
+            e.href  = actionUrl;
+            e.title = titles[whatCanDo];
+            div.appendChild(e);
+            var i = document.createElement("img");
+            i.src = iconURLs[whatCanDo];
+            e.appendChild(i);
 
-    if (!enableCreation) {
-      return;
-    }
-    if (!window.xooCreateButtonInitted) {
-      window.xooCreateButtonInitted = true;
-      // Add the buttons
-      $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get', 'elem=oOCreateButtons'), function(data) {
-        $('#attachmentscontent').append(data);
-      }).done(function() {
+            $(div).insertBefore(elem);
+        });
+
+        if (!enableCreation) {
+            return;
+        }
+
+
+        var ooCreateButtons = document.createElement("div");
+        ooCreateButtons.setAttribute("id", "oOCreateButtons");
+
+        function addCreateButton(btnStlCls, btnIconCls, btnTypeCls, msgLabel) {
+            var i = document.createElement("input");
+            i.setAttribute("type", "button");
+            i.setAttribute("class",
+                "btn btn-" + btnStlCls + " btn-" + btnTypeCls + " " + btnTypeCls);
+            i.setAttribute("value", msgLabel);
+            ooCreateButtons.appendChild(i);
+            ooCreateButtons.appendChild(document.createTextNode(String.fromCharCode(160)));
+        }
+        addCreateButton("primary", "ootext", "oONewText",
+            $jsontool.serialize($services.localization.render('xoo.creationButtons.text.label')));
+        addCreateButton("success", "oosheet", "oONewSpreadsheet",
+            $jsontool.serialize($services.localization.render('xoo.creationButtons.sheet.label')));
+        addCreateButton("warning", "ooprez", "oONewPresentation",
+            $jsontool.serialize($services.localization.render('xoo.creationButtons.prez.label')));
+
+        $('#attachmentscontent').append(ooCreateButtons);
+
         // Button events
         $('#attachmentscontent').on('click', '.oONewText', function() {
-          displayPopupNew('document');
+            displayPopupNew('document');
         });
         $('#attachmentscontent').on('click', '.oONewSpreadsheet', function() {
-          displayPopupNew('spreadsheet');
+            displayPopupNew('spreadsheet');
         });
         $('#attachmentscontent').on('click', '.oONewPresentation', function() {
-          displayPopupNew('presentation');
+            displayPopupNew('presentation');
         });
-      });
-    }
-  };
 
-  $(decorateWithXooButtons);
-  $(document).on('xwiki:html5upload:fileFinished', decorateWithXooButtons);
-  $(document).on('xwiki:docextra:loaded', decorateWithXooButtons);
+    };
+
+    $(decorateWithXooButtons);
+    $(document).on('xwiki:html5upload:fileFinished', decorateWithXooButtons);
+    $(document).on('xwiki:docextra:loaded', decorateWithXooButtons);
 });</code>
     </property>
     <property>
