@@ -30,7 +30,7 @@
   <artifactId>application-onlyoffice-connector-ui</artifactId>
   <packaging>xar</packaging>
   <name>OnlyOffice Connector - UI</name>
-  <description>Edit attachments with OnlyOffice. Note that this is a paying application.</description>
+  <description>View, edit and collaborate real-time on text documents, spreadsheets and presentations. Comes with the OnlyOffice server preconfigured for testing. The app can be purchased individually or part of the XWiki Pro package. Try it free.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>OnlyOffice Connector Application</xwiki.extension.name>

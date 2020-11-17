@@ -32,7 +32,7 @@
   <version>1.4.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>OnlyOffice Connector - Parent POM</name>
-  <description>Edit attachments with OnlyOffice.</description>
+  <description>View, edit and collaborate real-time on text documents, spreadsheets and presentations. Comes with the OnlyOffice server preconfigured for testing. The app can be purchased individually or part of the XWiki Pro package. Try it free.</description>
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/xwikisas/application-onlyoffice-connector/issues</url>
