@@ -25,11 +25,11 @@
   <parent>
    <groupId>com.xwiki.parent</groupId>
    <artifactId>xwikisas-parent-platform</artifactId>
-   <version>9.11-5</version>
+   <version>11.10</version>
  </parent>
   <groupId>com.xwiki.onlyoffice-connector</groupId>
   <artifactId>application-onlyoffice-connector</artifactId>
-  <version>1.4.2-SNAPSHOT</version>
+  <version>1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>OnlyOffice Connector - Parent POM</name>
   <description>View, edit and collaborate real-time on text documents, spreadsheets and presentations. Comes with the OnlyOffice server preconfigured for testing. The app can be purchased individually or part of the XWiki Pro package. Try it free.</description>
@@ -38,7 +38,7 @@
     <url>https://github.com/xwikisas/application-onlyoffice-connector/issues</url>
   </issueManagement>
   <properties>
-    <licensing.version>1.16.1</licensing.version>
+    <licensing.version>1.19</licensing.version>
     <netflux.version>1.5</netflux.version>
   </properties>
   <modules>
@@ -58,7 +58,7 @@
       </releases>
       <snapshots>
         <enabled>false</enabled>
-      </snapshots> 
+      </snapshots>
     </repository>
   </repositories>
   <scm>
