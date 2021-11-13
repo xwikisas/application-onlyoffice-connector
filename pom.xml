@@ -39,7 +39,7 @@
   </issueManagement>
   <properties>
     <licensing.version>1.20</licensing.version>
-    <netflux.version>1.5</netflux.version>
+    <netflux.version>1.6</netflux.version>
   </properties>
   <modules>
     <module>application-onlyoffice-connector-ui</module>
