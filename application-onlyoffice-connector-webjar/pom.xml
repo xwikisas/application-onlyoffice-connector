@@ -45,4 +45,19 @@
       <artifactId>jquery</artifactId>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.searls</groupId>
+        <artifactId>jasmine-maven-plugin</artifactId>
+        <!-- Skip the execution of the Jasmine tests for now because:
+          * we don't have any tests yet
+          * PhantomJS doesn't run on our build agent (CI) and we don't have Chrome headless instaled either. We need to
+            see how to run these tests inside a Docker container. -->
+        <configuration>
+          <skipJasmineTests>true</skipJasmineTests>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
