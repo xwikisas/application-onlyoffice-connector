@@ -54,7 +54,7 @@
     'view': 'onlyOffice-logo-grey.png'
   })
   #set ($mainDoc = $xwiki.getDocument('XWikiOnlyOfficeCode.XooEdit'))
-  #set ($logoURL = $mainDoc.getAttachmentURL($icons.get($request.whatCanDo)))
+  #set ($logoURL = $services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', "images/$icons.get($request.whatCanDo)"))
   #set ($queryString = $escapetool.url({
     'filename': $request.filename,
     'document': $request.document,
