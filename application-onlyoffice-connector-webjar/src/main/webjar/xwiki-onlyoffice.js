@@ -231,7 +231,7 @@ define(['jquery'], function ($) {
       events: {
         onAppReady: onReady,
         onReady: onReady,
-        onDownloadAs: function (evt) { saveCallbackOO(evt.data); },
+        onDownloadAs: function (evt) { saveCallbackOO(evt.data.url || evt.data); },
         onRequestEditRights: function () { docEditor.applyEditRights(true); },
         onError: onError
       }
