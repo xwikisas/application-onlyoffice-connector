@@ -192,6 +192,12 @@ define(['jquery'], function ($) {
       }, false));
       $('#button-ecv').on('click', switchToSaveableFile);
       $('#button-cnv').on('click', save(switchToSaveableFile, true));
+      $('#cnv-format').on('change', function() {
+        var selectedType = $(this).val();
+        if (selectedType && docTypeForExtension(selectedType)) {
+          ctx.saveName = ctx.config.FILENAME.slice(0, ctx.config.FILENAME.lastIndexOf('.')) + '.' + selectedType;
+        }
+      });
     };
 
     window.docEditor = docEditor = new DocsAPI.DocEditor("iframeEditor", {
@@ -279,6 +285,8 @@ define(['jquery'], function ($) {
           alert("internal error: invalid save type of " + ctx.fileType);
           return;
         }
+        var selectedType = $('#cnv-format').val();
+        type = selectedType && docTypeForExtension(selectedType) ? selectedType : type;
         ctx.saveName =
           ctx.config.FILENAME.slice(0, ctx.config.FILENAME.lastIndexOf('.')) + '.' + type;
         var loadRealtimeOO = function (key) {
