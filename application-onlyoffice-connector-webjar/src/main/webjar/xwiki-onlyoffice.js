@@ -24,6 +24,7 @@ define(['jquery'], function ($) {
   ];
   var SPREADSHEET_EXTENSIONS = [ "ods", "csv", "xls", "xlsx" ];
   var PRESENTATION_EXTENSIONS = [ "ppt", "pptx", "odp", "ppsx" ];
+  var SAVABLE_EXTENSIONS = ["docx", "odt", "pptx", "odp", "ods", "xlsx"];
 
   var docTypeForExtension = function (ext) {
     if (TEXT_EXTENSIONS.indexOf(ext) !== -1) {
@@ -38,7 +39,8 @@ define(['jquery'], function ($) {
   };
 
   var saveTypeForExtension = function (ext) {
-    return ({
+    return SAVABLE_EXTENSIONS.indexOf(ext) >= 0 ? ext :
+    ({
       text: 'docx',
       spreadsheet: 'xlsx',
       presentation: 'pptx'
@@ -123,9 +125,9 @@ define(['jquery'], function ($) {
         setFormEnabled(false);
         notification('inprogress');
         if (isConversion) {
-          setTimeout(function () { saveCallbackOO(ctx.url, ctx.saveName); });
+          setTimeout(function () { docEditor.downloadAs(ctx.saveType); });
         } else {
-          docEditor.downloadAs();
+          docEditor.downloadAs(ctx.fileType);
         }
         var saveTimeout = setTimeout(function () {
           notification('error', 'Request timed out');
@@ -148,7 +150,7 @@ define(['jquery'], function ($) {
       };
     };
 
-    var saveCallbackOO = function (url, optUploadName) {
+    var saveCallbackOO = function (url) {
       console.log("saveCallbackOO(" + url + ")");
       httpGet(url, function (err, dat) {
         if (err) {
@@ -156,7 +158,7 @@ define(['jquery'], function ($) {
           return;
         }
         var upURL = ctx.config.REST_DOC_URL + '/attachments/' +
-          encodeURIComponent(optUploadName || ctx.config.FILENAME);
+          encodeURIComponent(ctx.saveName);
         console.log("saving to " + upURL);
         httpUpload(upURL, dat, function (err, ret) {
           if (err) {
@@ -195,6 +197,7 @@ define(['jquery'], function ($) {
       $('#cnv-format').on('change', function() {
         var selectedType = $(this).val();
         if (selectedType && docTypeForExtension(selectedType)) {
+          ctx.saveType = selectedType;
           ctx.saveName = ctx.config.FILENAME.slice(0, ctx.config.FILENAME.lastIndexOf('.')) + '.' + selectedType;
         }
       });
@@ -280,15 +283,15 @@ define(['jquery'], function ($) {
         ctx.fileType = config.FILENAME.replace(/.*\.([^\.]*)$/, function (all, a) {
           return a;
         });
-        var type = saveTypeForExtension(ctx.fileType);
-        if (typeof(type) !== 'string') {
+        ctx.saveType = saveTypeForExtension(ctx.fileType);
+        if (typeof(ctx.saveType) !== 'string') {
           alert("internal error: invalid save type of " + ctx.fileType);
           return;
         }
         var selectedType = $('#cnv-format').val();
-        type = selectedType && docTypeForExtension(selectedType) ? selectedType : type;
+        ctx.saveType = selectedType && SAVABLE_EXTENSIONS.indexOf(selectedType) >= 0 ? selectedType : ctx.saveType;
         ctx.saveName =
-          ctx.config.FILENAME.slice(0, ctx.config.FILENAME.lastIndexOf('.')) + '.' + type;
+          ctx.config.FILENAME.slice(0, ctx.config.FILENAME.lastIndexOf('.')) + '.' + ctx.saveType;
         var loadRealtimeOO = function (key) {
           ctx.vkey = key;
           ctx.key = key;
@@ -318,7 +321,7 @@ define(['jquery'], function ($) {
               ctx.localurl = ctx.url.replace(/^.*\/cache\/files\//,
                                'http://localhost/cache/files/');
               launchEditor(ctx);
-            }, "POST", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            }, "POST", blob.type);
           });
         };
         if (config.ALLOW_REALTIME) {
