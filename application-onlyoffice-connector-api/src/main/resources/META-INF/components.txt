@@ -1,0 +1,2 @@
+com.xwiki.onlyofficeconnector.internal.DefaultAttachmentFormatManager
+com.xwiki.onlyofficeconnector.internal.rest.DefaultAttachmentFormatResource

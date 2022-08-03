@@ -24,7 +24,6 @@ define(['jquery'], function ($) {
   ];
   var SPREADSHEET_EXTENSIONS = [ "ods", "csv", "xls", "xlsx" ];
   var PRESENTATION_EXTENSIONS = [ "ppt", "pptx", "odp", "ppsx" ];
-  var SAVABLE_EXTENSIONS = ["docx", "odt", "pptx", "odp", "ods", "xlsx"];
 
   var docTypeForExtension = function (ext) {
     if (TEXT_EXTENSIONS.indexOf(ext) !== -1) {
@@ -39,8 +38,7 @@ define(['jquery'], function ($) {
   };
 
   var saveTypeForExtension = function (ext) {
-    return SAVABLE_EXTENSIONS.indexOf(ext) >= 0 ? ext :
-    ({
+    return ({
       text: 'docx',
       spreadsheet: 'xlsx',
       presentation: 'pptx'
@@ -112,6 +110,26 @@ define(['jquery'], function ($) {
     }
   };
 
+  var initCtxFileInfo = function (ctx) {
+    ctx.fileType = ctx.config.FILENAME.replace(/.*\.([^\.]*)$/, function (all, a) {
+      return a;
+    });
+    ctx.saveType = ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0 ?
+      ctx.fileType : saveTypeForExtension(ctx.fileType);
+    if (typeof(ctx.saveType) !== 'string') {
+      return;
+    }
+    var selectedType = $('#cnv-format').val();
+    ctx.saveType = selectedType && ctx.config.SAVABLE_EXTENSIONS.indexOf(selectedType) >= 0 ?
+      selectedType : ctx.saveType;
+    ctx.saveName =
+      ctx.config.FILENAME.slice(0, ctx.config.FILENAME.lastIndexOf('.')) + '.' + ctx.saveType;
+    if (ctx.config.CONVERSION == 'libre' && ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0) {
+      ctx.saveType = ctx.fileType;
+      ctx.fileType = saveTypeForExtension(ctx.fileType);
+    }
+  };
+
   var launchEditor = function (ctx) {
     var docEditor;
     var afterSave;
@@ -157,8 +175,9 @@ define(['jquery'], function ($) {
           afterSave("downloading", err);
           return;
         }
-        var upURL = ctx.config.REST_DOC_URL + '/attachments/' +
-          encodeURIComponent(ctx.saveName);
+        var upURL = ctx.config.CONVERSION == 'libre' && ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0 ?
+            ctx.config.ATTACH_URL :
+            ctx.config.REST_DOC_URL + '/attachments/' + encodeURIComponent(ctx.saveName);
         console.log("saving to " + upURL);
         httpUpload(upURL, dat, function (err, ret) {
           if (err) {
@@ -272,6 +291,12 @@ define(['jquery'], function ($) {
   return function (config) {
     require([config.OOAPI_PATH], function () {
       $(function () {
+        var SAVABLE_EXTENSIONS = ["docx", "pptx", "xlsx"];
+        if (config.CONVERSION != 'force') {
+          SAVABLE_EXTENSIONS.push('odt');
+          SAVABLE_EXTENSIONS.push('odp');
+          SAVABLE_EXTENSIONS.push('ods');
+        }
         var ctx = {
           config: config,
           fileType: undefined,
@@ -280,18 +305,16 @@ define(['jquery'], function ($) {
           url: undefined,
           saveName: undefined
         };
+        ctx.config.SAVABLE_EXTENSIONS = SAVABLE_EXTENSIONS;
         ctx.fileType = config.FILENAME.replace(/.*\.([^\.]*)$/, function (all, a) {
           return a;
         });
-        ctx.saveType = saveTypeForExtension(ctx.fileType);
+        ctx.config.SAVABLE_EXTENSIONS = SAVABLE_EXTENSIONS;
+        initCtxFileInfo(ctx);
         if (typeof(ctx.saveType) !== 'string') {
           alert("internal error: invalid save type of " + ctx.fileType);
           return;
         }
-        var selectedType = $('#cnv-format').val();
-        ctx.saveType = selectedType && SAVABLE_EXTENSIONS.indexOf(selectedType) >= 0 ? selectedType : ctx.saveType;
-        ctx.saveName =
-          ctx.config.FILENAME.slice(0, ctx.config.FILENAME.lastIndexOf('.')) + '.' + ctx.saveType;
         var loadRealtimeOO = function (key) {
           ctx.vkey = key;
           ctx.key = key;

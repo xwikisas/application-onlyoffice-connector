@@ -44,13 +44,14 @@
 #if ($hasLicense)
 #set ($paramDoc = $xwiki.getDocument('XWikiOnlyOfficeCode.ConfigurationClass'))
 #set ($paramClass = 'XWikiOnlyOfficeCode.ConfigurationClass')
+#set ($config = $paramDoc.getObject($paramClass))
 #if ($xcontext.isMainWiki())
 #set ($params = {
-  'general': ['onlyOfficeServer', 'enableCreation', 'enableRealtime']
+  'general': ['onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion']
 })
 #else
 #set ($params = {
-  'general': ['useGlobalConfig', 'onlyOfficeServer', 'enableCreation', 'enableRealtime']
+  'general': ['useGlobalConfig', 'onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion']
 })
 {{html clean='false'}}
 &lt;script&gt;
@@ -77,6 +78,11 @@ onChange(jQuery(this).is(':checked'));
 &lt;/script&gt;
 {{/html}}
 #end
+#if ($config.getProperty('conversion').getValue() == 'libre' &amp;&amp; !$services.officemanager.isConnected())
+
+  {{warning}}$escapetool.xml($services.localization.render('xoo.config.conversion.libreWarning')){{/warning}}
+
+#end
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}
 #else
 {{error}}#getMissingLicenseMessage('xoo.extension.name'){{/error}}
@@ -91,6 +97,31 @@ onChange(jQuery(this).is(':checked'));
     <defaultWeb/>
     <nameField/>
     <validationScript/>
+    <conversion>
+      <cache>0</cache>
+      <customDisplay/>
+      <defaultValue>onlyoffice</defaultValue>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <freeText>forbidden</freeText>
+      <hint/>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>conversion</name>
+      <number>5</number>
+      <picker>1</picker>
+      <prettyName>conversion</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>force=Convert to separate file|onlyoffice=OnlyOffice|libre=LibreOffice</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </conversion>
     <enableCreation>
       <customDisplay/>
       <defaultValue/>
@@ -392,6 +423,31 @@ onChange(jQuery(this).is(':checked'));
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <conversion>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue>onlyoffice</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>conversion</name>
+        <number>5</number>
+        <picker>1</picker>
+        <prettyName>conversion</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>force=Convert to separate file|onlyoffice=OnlyOffice|libre=LibreOffice</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </conversion>
       <enableCreation>
         <customDisplay/>
         <defaultValue/>
@@ -448,6 +504,9 @@ onChange(jQuery(this).is(':checked'));
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </useGlobalConfig>
     </class>
+    <property>
+      <conversion>force</conversion>
+    </property>
     <property>
       <enableCreation>1</enableCreation>
     </property>

@@ -48,18 +48,24 @@
 #end
 #set ($OO_SERVER = $OO_CONF_OBJ.getProperty('onlyOfficeServer').getValue())
 #set ($ALLOW_REALTIME = $OO_CONF_OBJ.getProperty('enableRealtime').getValue())
+#set ($OO_CONVERSION = $OO_CONF_OBJ.getProperty('conversion').getValue())
 #if ("$!OO_SERVER" == '')
   #set ($OO_SERVER = 'https://onlyoffice.xwiki.com')
 #end
 #set ($CONVERTABLE_FILETYPES0 = {
-  '.odt': ['.doc', '.docx', '.html', '.htm', '.rtf', '.txt', '.mht'],
   '.docx': ['.doc', '.odt', '.html', '.htm', '.rtf', '.txt', '.mht'],
-  '.ods': ['.xls', '.xlsx', '.csv'],
   '.xlsx': ['.xls', '.ods', '.csv'],
-  '.odp': ['.ppt', '.pptx', '.ppsx'],
   '.pptx': ['.ppt', '.odp', '.ppsx']
 })
-#set ($EDITABLE_FILETYPES = ['.docx', '.odt', '.xlsx', '.ods', '.pptx', '.odp'])
+#set ($EDITABLE_FILETYPES = ['.docx', '.xlsx', '.pptx'])
+
+#if ($OO_CONVERSION != 'force')
+  #set ($discard = $CONVERTABLE_FILETYPES0.put('.odt', ['.doc', '.docx', '.html', '.htm', '.rtf', '.txt', '.mht']))
+  #set ($discard = $CONVERTABLE_FILETYPES0.put('.ods', ['.xls', '.xlsx', '.csv']))
+  #set ($discard = $CONVERTABLE_FILETYPES0.put('.odp', ['.ppt', '.pptx', '.ppsx']))
+  #set ($discard = $EDITABLE_FILETYPES.addAll(['.odt', '.ods', '.odp']))
+  #set ($ODF_FILETYPES = {'.odt': '.docx', '.ods': '.xlsx', '.odp': '.odp'})
+#end
 ##
 #if ("$!request.document" == '')
   $services.localization.render('xoo.validation.documentMissing')
@@ -92,6 +98,9 @@
   #set ($mode = 'edit')
   #set ($fileNoType = $filename.substring(0, $filename.lastIndexOf('.')))
   #set ($fileType = $filename.substring($filename.lastIndexOf('.')))
+  #if ($OO_CONVERSION == 'libre' &amp;&amp; (!$services.officemanager.isConnected() || !$ODF_FILETYPES.keySet().contains($fileType)))
+    #set ($OO_CONVERSION = 'onlyoffice')
+  #end
   #if (!$EDITABLE_FILETYPES.contains($fileType))
     #set ($convertableFiletypes = {})
     #foreach ($key in $CONVERTABLE_FILETYPES0.keySet())
@@ -161,11 +170,15 @@
             p[0].innerHTML = err;
           }
         }
+        #set ($attachUrl = "$docu.getAttachmentURL($filename,'download','cb=dateOfToday')")
+        #if ($OO_CONVERSION == 'libre' &amp;&amp; $mode == 'edit')
+          #set ($attachUrl = "${services.rest.url($docu.documentReference)}/attachments/${filename}/formats/${ODF_FILETYPES.get($fileType).substring(1)}?fallback=true")
+        #end
         require(["$services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', 'xwiki-onlyoffice.js', { 'cb': 'dateOfToday'})".replace('dateOfToday', new Date().getTime())], function (oojs) {
           oojs({
-            ATTACH_URL: "$docu.getAttachmentURL($filename,'download','cb=dateOfToday')".replace('dateOfToday', new Date().getTime()),
+            ATTACH_URL: "$attachUrl".replace('dateOfToday', new Date().getTime()),
             FILEUPLOAD_URL: "${OO_SERVER}/FileUploader.ashx",
-
+            CONVERSION: "$OO_CONVERSION",
             // Realtime
             ALLOW_REALTIME: "$!ALLOW_REALTIME" === '1',
             OOAPI_PATH: "${OO_SERVER}/web-apps/apps/api/documents/api.js",
@@ -422,6 +435,7 @@
 // it should fire everytime a view page is displayed
 require(['jquery'],function($) {
   var enableCreation = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == '1';
+  var forcedConversion = "$!OO_CONF_OBJ.getProperty('conversion').getValue()" == 'force';
 
   var fullName = XWiki.Document.currentDocumentReference.toString();
 
@@ -480,6 +494,9 @@ require(['jquery'],function($) {
           fileType = ['.pptx', '.odp'];
           buttonType = 'btn-warning btn-ooprez';
         }
+        if (forcedConversion) {
+          fileType.pop();
+        }
         var defaultName = getDefaultName(fileType[0]);
 
         var queryString = $.param({
@@ -521,11 +538,21 @@ require(['jquery'],function($) {
   var decorateWithXooButtons = function() {
     var hasEditRights = XWiki.hasEdit;
     var canDoByExt = { };
-
-    ['docx', 'odt', 'xlsx', 'ods', 'pptx', 'odp'].forEach(function(x) {
+    var editableFormats = ['docx', 'xlsx', 'pptx'];
+    var convertibleFormats = ['xls', 'csv', 'doc', 'ppt', 'pps', 'ppsx', 'rtf', 'txt', 'mht', 'html', 'htm'];
+    if (!forcedConversion) {
+        editableFormats.push('odt');
+        editableFormats.push('ods');
+        editableFormats.push('odp');
+    } else {
+        convertibleFormats.push('odt');
+        convertibleFormats.push('ods');
+        convertibleFormats.push('odp');
+    }
+    editableFormats.forEach(function(x) {
       canDoByExt[x] = 'edit';
     });
-    ['xls', 'csv', 'doc', 'ppt', 'pps', 'ppsx', 'rtf', 'txt', 'mht', 'html', 'htm'].forEach(function(x) {
+    convertibleFormats.forEach(function(x) {
       canDoByExt[x] = 'convert';
     });
     ['pdf', 'djvu', 'fb2', 'epub', 'xps'].forEach(function(x) {

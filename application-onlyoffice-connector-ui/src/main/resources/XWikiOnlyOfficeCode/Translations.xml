@@ -61,7 +61,12 @@ xoo.inFrameContent.onPage=on page
 xoo.validation.attachmentExists=An attachment with that name ({0}) already exists. Please choose another name.
 xoo.validation.attachmentMissing=Document or attachment not found!
 xoo.validation.documentMissing=Document parameter required!
-xoo.validation.filenameMissing=Filename parameter required!</content>
+xoo.validation.filenameMissing=Filename parameter required!
+xoo.config.conversion.libreWarning=The XWiki instance is not connected to a LibreOffice server. Please configure the office server properly or use another conversion method.
+XWikiOnlyOfficeCode.ConfigurationClass_conversion=Conversion of ODF documents when editing
+XWikiOnlyOfficeCode.ConfigurationClass_conversion_force=Convert to a different document
+XWikiOnlyOfficeCode.ConfigurationClass_conversion_onlyoffice=(Beta) On the fly using OnlyOffice
+XWikiOnlyOfficeCode.ConfigurationClass_conversion_libre=(Beta) On the fly using LibreOffice</content>
   <object>
     <name>XWikiOnlyOfficeCode.Translations</name>
     <number>0</number>
