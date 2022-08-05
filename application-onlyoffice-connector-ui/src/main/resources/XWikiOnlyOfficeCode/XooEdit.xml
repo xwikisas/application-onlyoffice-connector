@@ -68,11 +68,11 @@
 #end
 ##
 #if ("$!request.document" == '')
-  $services.localization.render('xoo.validation.documentMissing')
+  $escapetool.xml($services.localization.render('xoo.validation.documentMissing'))
 #else
   #set ($docu = $xwiki.getDocument($request.document))
   #if ("$!request.filename" == '')
-    $services.localization.render('xoo.validation.filenameMissing')
+    $escapetool.xml($services.localization.render('xoo.validation.filenameMissing'))
   #else
     #set ($filename = $request.filename)
     #set ($fileType = $filename.substring($filename.lastIndexOf('.')))
@@ -93,12 +93,13 @@
   #end
 #end
 #if (!$attachment)
-  $services.localization.render('xoo.validation.attachmentMissing')
+  $escapetool.xml($services.localization.render('xoo.validation.attachmentMissing'))
 #else
   #set ($mode = 'edit')
   #set ($fileNoType = $filename.substring(0, $filename.lastIndexOf('.')))
   #set ($fileType = $filename.substring($filename.lastIndexOf('.')))
-  #if ($OO_CONVERSION == 'libre' &amp;&amp; (!$services.officemanager.isConnected() || !$ODF_FILETYPES.keySet().contains($fileType)))
+  #if ($OO_CONVERSION == 'officeServer' &amp;&amp; (!$services.officemanager.isConnected() ||
+    !$ODF_FILETYPES.keySet().contains($fileType)))
     #set ($OO_CONVERSION = 'onlyoffice')
   #end
   #if (!$EDITABLE_FILETYPES.contains($fileType))
@@ -130,7 +131,7 @@
     #end
   #end
   #if ($mode == 'edit')
-    #set ($currentAction = "$services.localization.render('editing') ")
+    #set ($currentAction = "$escapetool.xml($services.localization.render('editing')) ")
     #set ($canEdit = true)
   #else
     #set ($currentAction = '')
@@ -171,8 +172,8 @@
           }
         }
         #set ($attachUrl = "$docu.getAttachmentURL($filename,'download','cb=dateOfToday')")
-        #if ($OO_CONVERSION == 'libre' &amp;&amp; $mode == 'edit')
-          #set ($attachUrl = "${services.rest.url($docu.documentReference)}/attachments/${filename}/formats/${ODF_FILETYPES.get($fileType).substring(1)}?fallback=true")
+        #if ($OO_CONVERSION == 'officeServer' &amp;&amp; $mode == 'edit')
+          #set ($attachUrl = "${services.rest.url($docu.documentReference)}/attachments/${filename}/formats/${ODF_FILETYPES.get($fileType).substring(1)}?fallback=true&amp;cb=dateOfToday")
         #end
         require(["$services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', 'xwiki-onlyoffice.js', { 'cb': 'dateOfToday'})".replace('dateOfToday', new Date().getTime())], function (oojs) {
           oojs({
@@ -211,8 +212,8 @@
               &lt;td style="vertical-align: middle"&gt;
                 &lt;strong&gt;$currentAction&lt;/strong&gt;
                 &lt;em&gt;$request.filename&lt;/em&gt;
-                $services.localization.render('xoo.inFrameContent.onPage')
-                &lt;a href="${docu.URL}#Attachments" title="$services.localization.render('cancel')"&gt;$docu.displayTitle&lt;/a&gt;
+                $escapetool.xml($services.localization.render('xoo.inFrameContent.onPage'))
+                &lt;a href="${docu.URL}#Attachments" title="$escapetool.xml($services.localization.render('cancel'))"&gt;$docu.displayTitle&lt;/a&gt;
               &lt;/td&gt;
               &lt;td style="text-align: right; vertical-align: middle"&gt;
                 &lt;form id="buttonsForm" onsubmit="return false;"&gt;
@@ -222,27 +223,27 @@
                     &lt;input id="button-sav" class="btn btn-success" type="submit" value="$services.localization.render('saveandview')" /&gt;
                   #elseif ($mode == 'convExists')
                     &lt;input id="button-ecv" class="btn btn-success" type="submit"
-                      value="$services.localization.render('xoo.inFrameContent.editConvertibleVersion.value')"
-                      title="$services.localization.render('xoo.inFrameContent.editConvertibleVersion.title', [$fileType, $convFiles])"
+                      value="$escapetool.xml($services.localization.render('xoo.inFrameContent.editConvertibleVersion.value'))"
+                      title="$escapetool.xml($services.localization.render('xoo.inFrameContent.editConvertibleVersion.title', [$fileType, $convFiles]))"
                     /&gt;
                     &lt;select id="cnv-format"&gt;
                       #foreach ($fileType in $convFiles)
-                        &lt;option #if($defaultTypes.indexOf($fileType) >= 0)selected#end value="$fileType.substring(1)"&gt;$fileType&lt;/option&gt;
+                        &lt;option #if($defaultTypes.indexOf($fileType) &gt;= 0)selected#end value="$fileType.substring(1)"&gt;$fileType&lt;/option&gt;
                       #end
                     &lt;/select&gt;
                   #elseif ($mode == 'convertable')
                     #set ($dataConvertable = $convertableTo.toString().replaceAll('\.\w+', '\"$0\"'))
                     &lt;input id="button-cnv" class="btn btn-success" type="submit" data-convertableto="$escapetool.xml($dataConvertable)"
-                      value="$services.localization.render('xoo.inFrameContent.convertForEditing.value')"
-                      title="$services.localization.render('xoo.inFrameContent.convertForEditing.title')"
+                      value="$escapetool.xml($services.localization.render('xoo.inFrameContent.convertForEditing.value'))"
+                      title="$escapetool.xml($services.localization.render('xoo.inFrameContent.convertForEditing.title'))"
                     /&gt;
                     &lt;select id="cnv-format"&gt;
                       #foreach ($fileType in $convertableTo)
-                        &lt;option #if($defaultTypes.indexOf($fileType) >= 0)selected#end value="$fileType.substring(1)"&gt;$fileType&lt;/option&gt;
+                        &lt;option #if($defaultTypes.indexOf($fileType) &gt;= 0)selected#end value="$fileType.substring(1)"&gt;$fileType&lt;/option&gt;
                       #end
                     &lt;/select&gt;
                   #end
-                  &lt;input id="button-cancel" class="btn btn-default" type="submit" name="action_cancel" value="$services.localization.render('cancel')" data-redirect-to="${docu.URL}#Attachments" /&gt;
+                  &lt;input id="button-cancel" class="btn btn-default" type="submit" name="action_cancel" value="$escapetool.xml($services.localization.render('cancel'))" data-redirect-to="${docu.URL}#Attachments" /&gt;
                 &lt;/form&gt;
               &lt;/td&gt;
             &lt;/tr&gt;
@@ -252,16 +253,16 @@
       &lt;div class="form"&gt;
         &lt;div id="iframeEditor"&gt;
           &lt;p&gt;
-            $services.localization.render('xoo.inFrameContent.loading')&lt;img src="$xwiki.getSkinFile('resources/icons/xwiki/spinner.gif', true)" /&gt;
+            $escapetool.xml($services.localization.render('xoo.inFrameContent.loading'))&lt;img src="$xwiki.getSkinFile('resources/icons/xwiki/spinner.gif', true)" /&gt;
           &lt;/p&gt;
         &lt;/div&gt;
       &lt;/div&gt;
       &lt;div class="xnotification-container"&gt;
         &lt;div style="display:none;" class="xnotification xnotification-inprogress"&gt;
-          $services.localization.render('core.editors.saveandcontinue.notification.inprogress')
+          $escapetool.xml($services.localization.render('core.editors.saveandcontinue.notification.inprogress'))
         &lt;/div&gt;
         &lt;div style="display:none;" class="xnotification xnotification-done"&gt;
-          $services.localization.render('core.editors.saveandcontinue.notification.done')
+          $escapetool.xml($services.localization.render('core.editors.saveandcontinue.notification.done'))
         &lt;/div&gt;
         &lt;div style="display:none;" class="xnotification xnotification-error"&gt;
           $services.localization.render("core.editors.saveandcontinue.notification.error", ["&lt;span id='ajaxRequestFailureReason'/&gt;"])
@@ -421,21 +422,10 @@
       <cache/>
     </property>
     <property>
-      <code>// Velocity
-#set($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-#set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-#set($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
-#set($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').value)
-#if ("$!OO_USE_GLOBAL_CONFIG" != '0')
-  #set($OO_CONF_REF = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-  #set($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-  #set($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
-#end
-// this file is copied into the JSExtension object when producing the XAR
-// it should fire everytime a view page is displayed
-require(['jquery'],function($) {
-  var enableCreation = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == '1';
-  var forcedConversion = "$!OO_CONF_OBJ.getProperty('conversion').getValue()" == 'force';
+      <code>require(['jquery'],function($) {
+  var ooConfig = JSON.parse($('#onlyOfficeConfig').text());
+  var enableCreation = ooConfig.enableCreation;
+  var forcedConversion = ooConfig.forcedConversion;
 
   var fullName = XWiki.Document.currentDocumentReference.toString();
 
@@ -541,13 +531,9 @@ require(['jquery'],function($) {
     var editableFormats = ['docx', 'xlsx', 'pptx'];
     var convertibleFormats = ['xls', 'csv', 'doc', 'ppt', 'pps', 'ppsx', 'rtf', 'txt', 'mht', 'html', 'htm'];
     if (!forcedConversion) {
-        editableFormats.push('odt');
-        editableFormats.push('ods');
-        editableFormats.push('odp');
+        editableFormats.push('odt', 'ods', 'odp');
     } else {
-        convertibleFormats.push('odt');
-        convertibleFormats.push('ods');
-        convertibleFormats.push('odp');
+        convertibleFormats.push('odt', 'ods', 'odp');
     }
     editableFormats.forEach(function(x) {
       canDoByExt[x] = 'edit';
@@ -616,10 +602,10 @@ require(['jquery'],function($) {
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -942,7 +928,164 @@ html#ooFrame {
       <parse/>
     </property>
     <property>
-      <use>always</use>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWikiOnlyOfficeCode.XooEdit</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>708f455c-efaf-4998-b7d0-3542d9976598</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+  {{html clean="false"}}
+  #if ($context.action == 'view')
+    #set ($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
+    #set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
+    #set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
+
+    #set ($enableCreate = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == '1')
+    #set ($forcedConversion = "$!OO_CONF_OBJ.getProperty('conversion').getValue()" == 'force')
+    #set ($config = {
+      'enableCreation': $enableCreate,
+      'forcedConversion': $forcedConversion
+    })
+    &lt;script id="onlyOfficeConfig" type="application/json"&gt;$jsontool.serialize($config)&lt;/script&gt;
+    #set ($discard = $xwiki.ssx.use('XWikiOnlyOfficeCode.XooEdit'))
+    #set ($discard = $xwiki.jsx.use('XWikiOnlyOfficeCode.XooEdit'))
+  #end
+  {{/html}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
+    </property>
+    <property>
+      <name>com.xwiki.onlyoffice-connector.oo-buttons-decorator</name>
+    </property>
+    <property>
+      <parameters/>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

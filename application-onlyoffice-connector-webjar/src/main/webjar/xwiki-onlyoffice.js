@@ -124,7 +124,7 @@ define(['jquery'], function ($) {
       selectedType : ctx.saveType;
     ctx.saveName =
       ctx.config.FILENAME.slice(0, ctx.config.FILENAME.lastIndexOf('.')) + '.' + ctx.saveType;
-    if (ctx.config.CONVERSION == 'libre' && ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0) {
+    if (ctx.config.CONVERSION == 'officeServer' && ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0) {
       ctx.saveType = ctx.fileType;
       ctx.fileType = saveTypeForExtension(ctx.fileType);
     }
@@ -175,7 +175,8 @@ define(['jquery'], function ($) {
           afterSave("downloading", err);
           return;
         }
-        var upURL = ctx.config.CONVERSION == 'libre' && ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0 ?
+        var upURL = ctx.config.CONVERSION == 'officeServer' &&
+          ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0 ?
             ctx.config.ATTACH_URL :
             ctx.config.REST_DOC_URL + '/attachments/' + encodeURIComponent(ctx.saveName);
         console.log("saving to " + upURL);
@@ -293,9 +294,7 @@ define(['jquery'], function ($) {
       $(function () {
         var SAVABLE_EXTENSIONS = ["docx", "pptx", "xlsx"];
         if (config.CONVERSION != 'force') {
-          SAVABLE_EXTENSIONS.push('odt');
-          SAVABLE_EXTENSIONS.push('odp');
-          SAVABLE_EXTENSIONS.push('ods');
+          SAVABLE_EXTENSIONS.push('odt', 'odp', 'ods');
         }
         var ctx = {
           config: config,
@@ -309,7 +308,6 @@ define(['jquery'], function ($) {
         ctx.fileType = config.FILENAME.replace(/.*\.([^\.]*)$/, function (all, a) {
           return a;
         });
-        ctx.config.SAVABLE_EXTENSIONS = SAVABLE_EXTENSIONS;
         initCtxFileInfo(ctx);
         if (typeof(ctx.saveType) !== 'string') {
           alert("internal error: invalid save type of " + ctx.fileType);

@@ -58,7 +58,6 @@
           <skipJasmineTests>true</skipJasmineTests>
         </configuration>
       </plugin>
-      <!-- Remove plugins when pulling the files from webjar dependencies. -->
       <plugin>
         <groupId>org.xwiki.contrib</groupId>
         <artifactId>jshint-maven-plugin</artifactId>
@@ -71,6 +70,7 @@
         </executions>
         <configuration>
           <excludes>
+            <!-- TODO: Remove them from the webjar. -->
             <!-- Exclude third party JS files. -->
             <exclude>src/main/webjar/es6-promise.min.js</exclude>
             <exclude>src/main/webjar/reconnecting-websocket.js</exclude>

@@ -68,7 +68,7 @@ public class DefaultAttachmentFormatManager implements AttachmentFormatManager
     public byte[] convertAttachment(AttachmentReference attachmentReference, String format)
         throws AttachmentConversionException
     {
-        checkLibreOfficeServer();
+        checkOfficeServer();
 
         XWikiContext context = contextProvider.get();
         DocumentReference docRef = attachmentReference.getDocumentReference();
@@ -98,33 +98,33 @@ public class DefaultAttachmentFormatManager implements AttachmentFormatManager
     public void convertAndSave(AttachmentReference attachmentReference, String format, byte[] file)
         throws AttachmentConversionException
     {
-        checkLibreOfficeServer();
+        checkOfficeServer();
 
         DocumentReference docRef = attachmentReference.getDocumentReference();
         String attachmentName = attachmentReference.getName();
         XWikiContext context = contextProvider.get();
 
         try {
-            XWikiDocument document = context.getWiki().getDocument(docRef, context);
+            XWikiDocument document = context.getWiki().getDocument(docRef, context).clone();
             InputStream inputStream = new ByteArrayInputStream(file);
             String receivedFileName = changeExtensionAndGet(attachmentName, format);
 
-            OfficeConverterResult result =
-                officeServer.getConverter().convertDocument(Collections.singletonMap(receivedFileName, inputStream),
-                    receivedFileName, attachmentName);
-
-            document.setAttachment(attachmentName, FileUtils.openInputStream(result.getOutputFile()), context);
-
-            document.setAuthorReference(context.getUserReference());
-            context.getWiki().saveDocument(document, context);
-            result.close();
+            try (OfficeConverterResult result =
+                     officeServer.getConverter()
+                         .convertDocument(Collections.singletonMap(receivedFileName, inputStream), receivedFileName,
+                             attachmentName))
+            {
+                document.setAttachment(attachmentName, FileUtils.openInputStream(result.getOutputFile()), context);
+                document.setAuthorReference(context.getUserReference());
+                context.getWiki().saveDocument(document, context);
+            }
         } catch (OfficeConverterException | IOException | XWikiException e) {
             throw new AttachmentConversionException(
                 String.format(FAILED_CONVERSION_EXCEPTION_MESSAGE, attachmentReference, format), e);
         }
     }
 
-    private void checkLibreOfficeServer() throws AttachmentConversionException
+    private void checkOfficeServer() throws AttachmentConversionException
     {
         if (!officeServer.getState().equals(OfficeServer.ServerState.CONNECTED)) {
             try {

@@ -36,7 +36,7 @@ public interface AttachmentFormatManager
     /**
      * Convert an attachment to the desired format.
      *
-     * @param attachmentReference the reference of the attachments that needs conversion
+     * @param attachmentReference the reference of the attachment that needs conversion
      * @param format the format to which the attachment will be converted to
      * @return a byte array representing the contents of the converted file
      * @throws AttachmentConversionException if there were errors in locating or converting the attachment

@@ -78,9 +78,9 @@ onChange(jQuery(this).is(':checked'));
 &lt;/script&gt;
 {{/html}}
 #end
-#if ($config.getProperty('conversion').getValue() == 'libre' &amp;&amp; !$services.officemanager.isConnected())
+#if ($config.getProperty('conversion').getValue() == 'officeServer' &amp;&amp; !$services.officemanager.isConnected())
 
-  {{warning}}$escapetool.xml($services.localization.render('xoo.config.conversion.libreWarning')){{/warning}}
+  {{warning}}$escapetool.xml($services.localization.render('xoo.config.conversion.officeServerWarning')){{/warning}}
 
 #end
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}
@@ -119,7 +119,7 @@ onChange(jQuery(this).is(':checked'));
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <values>force=Convert to separate file|onlyoffice=OnlyOffice|libre=LibreOffice</values>
+      <values>force=Convert to separate file|onlyoffice=OnlyOffice|officeServer=Office Server</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </conversion>
     <enableCreation>
@@ -445,7 +445,7 @@ onChange(jQuery(this).is(':checked'));
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>force=Convert to separate file|onlyoffice=OnlyOffice|libre=LibreOffice</values>
+        <values>force=Convert to separate file|onlyoffice=OnlyOffice|officeServer=Office Server</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </conversion>
       <enableCreation>

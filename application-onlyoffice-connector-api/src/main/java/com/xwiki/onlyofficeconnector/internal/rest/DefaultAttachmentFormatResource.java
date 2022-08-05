@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeDocumentFormat;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rest.XWikiRestException;
@@ -67,33 +68,32 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
     public Response convertAttachment(String wikiName, String spaces, String pageName, String attachmentName,
         String format, Boolean fallBack) throws XWikiRestException
     {
-        DocumentReference docRef = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
-        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, docRef);
-        if (!authorizationManager.hasAccess(Right.VIEW, docRef)) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        Attachment attachment = getAttachment(wikiName, spaces, pageName, attachmentName);
+
+        OfficeConverter converter = officeServer.getConverter();
+        OfficeDocumentFormat inputFormat = converter.getDocumentFormat(attachmentName);
+        OfficeDocumentFormat outputFormat = converter.getDocumentFormat("fileName." + format);
+        if (!converter.isConversionSupported(inputFormat.getMediaType(), outputFormat.getMediaType())
+            && !Boolean.TRUE.equals(fallBack))
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("The conversion is not supported.").build();
         }
         try {
-            byte[] result = attachmentFormatManager.convertAttachment(attachmentReference, format);
-            OfficeDocumentFormat docFormat = officeServer.getConverter().getDocumentFormat(attachmentName);
+            byte[] result = attachmentFormatManager.convertAttachment(attachment.getReference(), format);
             return Response
                 .status(Response.Status.CREATED)
-                .type(docFormat.getMediaType())
+                .type(inputFormat.getMediaType())
                 .entity(result)
                 .build();
         } catch (AttachmentConversionException e) {
-            if (fallBack != null && fallBack) {
+            if (Boolean.TRUE.equals(fallBack)) {
                 try {
-                    Document doc = getDocumentInfo(wikiName, spaces, pageName, null, null, true, false).getDocument();
-                    Attachment attachment = doc.getAttachment(attachmentName);
-                    if (attachment == null) {
-                        throw new WebApplicationException(Response.Status.NOT_FOUND);
-                    }
                     return Response.ok().type(attachment.getMimeType()).entity(attachment.getContent()).build();
                 } catch (XWikiException ex) {
                     throw new XWikiRestException(ex);
                 }
             }
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new XWikiRestException(e);
         }
     }
 
@@ -105,14 +105,36 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
         DocumentReference docRef = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
 
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, docRef);
-        if (!authorizationManager.hasAccess(Right.EDIT, docRef)) {
+        if (!authorizationManager.hasAccess(Right.EDIT, attachmentReference)) {
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
         try {
             attachmentFormatManager.convertAndSave(attachmentReference, format, file);
             return Response.ok().build();
         } catch (AttachmentConversionException e) {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            throw new XWikiRestException(e);
         }
+    }
+
+
+    private Attachment getAttachment(String wikiName, String spaces, String pageName, String attachmentName)
+        throws XWikiRestException
+    {
+        Attachment attachment;
+        DocumentReference docRef = new DocumentReference(pageName, getSpaceReference(spaces, wikiName));
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, docRef);
+        if (!authorizationManager.hasAccess(Right.VIEW, attachmentReference)) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
+        try {
+            Document doc = getDocumentInfo(wikiName, spaces, pageName, null, null, true, false).getDocument();
+            attachment = doc.getAttachment(attachmentName);
+            if (attachment == null) {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+        } catch (XWikiException e) {
+            throw new XWikiRestException(e);
+        }
+        return attachment;
     }
 }
