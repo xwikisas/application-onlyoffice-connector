@@ -41,11 +41,11 @@
 #if ($request.elem == 'oOCreateButtons')
   &lt;div id="oOCreateButtons"&gt;
     &lt;input type="button" class="btn btn-primary btn-ootext oONewText"
-      value="$services.localization.render('xoo.creationButtons.text.label')" /&gt;
+      value="$escapetool.xml($services.localization.render('xoo.creationButtons.text.label'))" /&gt;
     &lt;input type="button" class="btn btn-success btn-oosheet oONewSpreadsheet"
-      value="$services.localization.render('xoo.creationButtons.sheet.label')" /&gt;
+      value="$escapetool.xml($services.localization.render('xoo.creationButtons.sheet.label'))" /&gt;
     &lt;input type="button" class="btn btn-warning btn-ooprez oONewPresentation"
-      value="$services.localization.render('xoo.creationButtons.prez.label')" /&gt;
+      value="$escapetool.xml($services.localization.render('xoo.creationButtons.prez.label'))" /&gt;
   &lt;/div&gt;
 #elseif ($request.elem == 'oOActionButtons')
   #set ($icons = {
@@ -54,14 +54,14 @@
     'view': 'onlyOffice-logo-grey.png'
   })
   #set ($mainDoc = $xwiki.getDocument('XWikiOnlyOfficeCode.XooEdit'))
-  #set ($logoURL = $mainDoc.getAttachmentURL($icons.get($request.whatCanDo)))
+  #set ($logoURL = $services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', "images/$icons.get($request.whatCanDo)"))
   #set ($queryString = $escapetool.url({
     'filename': $request.filename,
     'document': $request.document,
     'xpage': 'plain'
   }))
   #set ($actionURL = $mainDoc.getURL('view', $queryString))
-  #set ($title = $services.localization.render("xoo.attachments.actions.${request.whatCanDo}"))
+  #set ($title = $escapetool.xml($services.localization.render("xoo.attachments.actions.${request.whatCanDo}")))
   &lt;div class="btn-group xwikibuttonlinks oobutton"&gt;
     &lt;a class="oOEdit btn btn-xs btn-default" href="$actionURL" title="$title"&gt;
       &lt;img src="$logoURL"/&gt;
@@ -70,13 +70,24 @@
 #elseif ($request.elem == 'modalContent')
   #set ($attachmentName = "${request.defaultName}${request.fileType}")
   &lt;div class="modal-popup"&gt;
-    $services.localization.render("xoo.creationModal.${request.type}.title")
-    &lt;input size="30" type="text" id="oONewFileName" placeholder="$escapetool.xml($request.defaultName)"&gt;$request.fileType
+    $escapetool.xml($services.localization.render("xoo.creationModal.${request.type}.title"))
+    &lt;input size="30" type="text" id="oONewFileName" placeholder="$escapetool.xml($request.defaultName)"&gt;
+    #set($fileTypes = $request.parameterMap.fileTypes)
+    #if ($fileTypes.size() &gt; 1)
+      &lt;select id="oONewFileType"&gt;
+        #foreach ($fileType in $fileTypes)
+          &lt;option value="$fileType"&gt;$fileType&lt;/option&gt;
+        #end
+      &lt;/select&gt;
+    #else
+      $fileTypes[0]
+      &lt;input id="oONewFileType" type="hidden" value="$fileTypes[0]"&gt;
+    #end
     &lt;p class="hidden box errormessage" id="oONewFileError"&gt;
-      $services.localization.render('xoo.validation.attachmentExists', [$attachmentName])
+      $escapetool.xml($services.localization.render('xoo.validation.attachmentExists', [$attachmentName]))
     &lt;/p&gt;
     &lt;button class="btn btn-success $request.buttonType"&gt;
-      $services.localization.render("xoo.creationModal.${request.type}.creationButton")
+      $escapetool.xml($services.localization.render("xoo.creationModal.${request.type}.creationButton"))
     &lt;/button&gt;
   &lt;/div&gt;
 #end

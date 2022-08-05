@@ -52,10 +52,42 @@
         <artifactId>jasmine-maven-plugin</artifactId>
         <!-- Skip the execution of the Jasmine tests for now because:
           * we don't have any tests yet
-          * PhantomJS doesn't run on our build agent (CI) and we don't have Chrome headless instaled either. We need to
+          * PhantomJS doesn't run on our build agent (CI) and we don't have Chrome headless installed either. We need to
             see how to run these tests inside a Docker container. -->
         <configuration>
           <skipJasmineTests>true</skipJasmineTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.xwiki.contrib</groupId>
+        <artifactId>jshint-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>lint</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <excludes>
+            <!-- TODO: Remove them from the webjar. -->
+            <!-- Exclude third party JS files. -->
+            <exclude>src/main/webjar/es6-promise.min.js</exclude>
+            <exclude>src/main/webjar/reconnecting-websocket.js</exclude>
+            <exclude>src/main/webjar/netflux-client.js</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
+            <exclude>src/main/webjar/es6-promise.min.js</exclude>
+            <exclude>src/main/webjar/netflux-client.js</exclude>
+            <exclude>src/main/webjar/reconnecting-websocket.js</exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

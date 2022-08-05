@@ -158,8 +158,8 @@
     </property>
     <property>
       <code>var PATHS = {
-  '/bower_components/es6-promise/es6-promise.min.js': "$xwiki.getAttachmentURL('XWikiOnlyOfficeCode.XooEdit', 'es6-promise.min.js')",
-  '/bower_components/reconnectingWebsocket/reconnecting-websocket.js': "$xwiki.getAttachmentURL('XWikiOnlyOfficeCode.XooEdit', 'reconnecting-websocket.js')",
+  '/bower_components/es6-promise/es6-promise.min.js': "$services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', 'es6-promise.min.js')",
+  '/bower_components/reconnectingWebsocket/reconnecting-websocket.js': "$services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', 'reconnecting-websocket.js')",
 };
 for (var path in PATHS) { PATHS[path] = PATHS[path].replace(/\.js$/, ''); }
 require.config({
@@ -172,7 +172,7 @@ require.config({
 });
 
 define(['jquery',
-        "$xwiki.getAttachmentURL('XWikiOnlyOfficeCode.XooEdit', 'netflux-client.js')"], function ($, Netflux) {
+        "$services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', 'netflux-client.js')"], function ($, Netflux) {
     // Velocity
     var getKeysPath = "$xwiki.getURL('XWikiOnlyOfficeCode.GetKeys','get')?outputSyntax=plain";
     var websocketURL = "$!services.websocket.getURL('realtimeNetflux')";
