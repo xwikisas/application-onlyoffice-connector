@@ -1068,7 +1068,8 @@ html#ooFrame {
       'enableCreation': $enableCreate,
       'forcedConversion': $forcedConversion
     })
-    &lt;script id="onlyOfficeConfig" type="application/json"&gt;$jsontool.serialize($config)&lt;/script&gt;
+    &lt;script id="onlyOfficeConfig" type="application/json"&gt;$jsontool.serialize($config).replace(
+        '&lt;', '\u003C')&lt;/script&gt;
     #set ($discard = $xwiki.ssx.use('XWikiOnlyOfficeCode.XooEdit'))
     #set ($discard = $xwiki.jsx.use('XWikiOnlyOfficeCode.XooEdit'))
   #end
