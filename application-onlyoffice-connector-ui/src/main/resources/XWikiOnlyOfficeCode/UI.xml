@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-{{html}}
+{{html clean="false"}}
 #if ($request.elem == 'oOCreateButtons')
   &lt;div id="oOCreateButtons"&gt;
     &lt;input type="button" class="btn btn-primary btn-ootext oONewText"
