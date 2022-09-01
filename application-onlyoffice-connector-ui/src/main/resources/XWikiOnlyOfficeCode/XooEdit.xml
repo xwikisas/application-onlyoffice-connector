@@ -144,7 +144,7 @@
       &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
       &lt;title&gt;${currentAction}$escapetool.xml($request.filename)&lt;/title&gt;
       #template('stylesheets.vm')
-
+      &lt;link rel="stylesheet" type="text/css" href="$doc.getURL('ssx')"&gt;
       ## Old IE
       &lt;link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" /&gt;
       ## Present, HTML5
@@ -545,8 +545,13 @@
       canDoByExt[x] = 'view';
     });
 
+    // Attachments are displayed using a live table since 14.6.
+    var hasPagination = $("#_attachments table").length > 0;
+
     $("#_attachments span.name").each(function(i, elem) {
-      if ($(elem.parentNode).find('div.xwikibuttonlinks &gt; a.oOEdit').length) {
+      var searchPoint = hasPagination ? $(elem.parentNode.parentNode).find('.attachmentActions') : elem.parentNode;
+
+      if ($(searchPoint).find('a.oOEdit').length) {
         return;
       }
       var fileName = $(elem).find('a').text().trim();
@@ -563,11 +568,12 @@
         'elem': 'oOActionButtons',
         'document': fullName,
         'filename': fileName,
-        'whatCanDo': whatCanDo
+        'whatCanDo': whatCanDo,
+        'hasPagination': hasPagination
       });
 
       $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get', queryString), function(data) {
-        $(data).insertBefore(elem);
+        $(searchPoint).prepend(data);
       });
     });
 
@@ -594,6 +600,7 @@
   };
 
   $(decorateWithXooButtons);
+  $(document).on('xwiki:livetable:docAttachments:loadingComplete', decorateWithXooButtons);
   $(document).on('xwiki:html5upload:fileFinished', decorateWithXooButtons);
   $(document).on('xwiki:docextra:loaded', decorateWithXooButtons);
 });</code>
@@ -781,7 +788,7 @@ html#ooFrame {
       <parse/>
     </property>
     <property>
-      <use>always</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
@@ -916,6 +923,10 @@ html#ooFrame {
 
 .oobutton {
   padding-left: 5px;
+}
+.oOEdit .action-icon img {
+  height: 1em;
+  vertical-align: text-top;
 }</code>
     </property>
     <property>
