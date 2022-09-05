@@ -63,15 +63,15 @@
   #set ($actionURL = $mainDoc.getURL('view', $queryString))
   #set ($title = $escapetool.xml($services.localization.render("xoo.attachments.actions.${request.whatCanDo}")))
   #set ($label = $escapetool.xml($services.localization.render("xoo.attachments.actions.${request.whatCanDo}.label")))
-  #if ($request.get('hasPagination') == 'true')
+  #if ($request.get('asLink') == 'true')
   &lt;a class="action oOEdit" title="$title" href="$actionURL"&gt;
-    &lt;span class="action-icon"&gt;&lt;img src="$logoURL"/&gt;&lt;/span&gt;
+    &lt;span class="action-icon"&gt;&lt;img src="$logoURL" alt="$title"/&gt;&lt;/span&gt;
     &lt;span class="action-label"&gt;$label&lt;/span&gt;
   &lt;/a&gt;
   #else
   &lt;div class="btn-group xwikibuttonlinks oobutton"&gt;
     &lt;a class="oOEdit btn btn-xs btn-default" href="$actionURL" title="$title"&gt;
-      &lt;img src="$logoURL"/&gt;
+      &lt;img src="$logoURL" alt="$title"/&gt;
     &lt;/a&gt;
   &lt;/div&gt;
   #end

@@ -546,10 +546,10 @@
     });
 
     // Attachments are displayed using a live table since 14.6.
-    var hasPagination = $("#_attachments table").length > 0;
+    var hasPagination = $("#_attachments table").length &gt; 0;
 
     $("#_attachments span.name").each(function(i, elem) {
-      var searchPoint = hasPagination ? $(elem.parentNode.parentNode).find('.attachmentActions') : elem.parentNode;
+      var searchPoint = hasPagination ? $(elem).closest('tr').find('.attachmentActions') : elem.parentNode;
 
       if ($(searchPoint).find('a.oOEdit').length) {
         return;
@@ -569,7 +569,7 @@
         'document': fullName,
         'filename': fileName,
         'whatCanDo': whatCanDo,
-        'hasPagination': hasPagination
+        'asLink': hasPagination
       });
 
       $.post(new XWiki.Document('UI', 'XWikiOnlyOfficeCode').getURL('get', queryString), function(data) {
@@ -600,6 +600,11 @@
   };
 
   $(decorateWithXooButtons);
+  $(document).on('xwiki:livedata:afterEntryFetch', function (event) {
+    if ($(event.target).attr('id').indexOf("docAttachments") &gt;= 0) {
+      setTimeout(decorateWithXooButtons, 0);
+    }
+  });
   $(document).on('xwiki:livetable:docAttachments:loadingComplete', decorateWithXooButtons);
   $(document).on('xwiki:html5upload:fileFinished', decorateWithXooButtons);
   $(document).on('xwiki:docextra:loaded', decorateWithXooButtons);
