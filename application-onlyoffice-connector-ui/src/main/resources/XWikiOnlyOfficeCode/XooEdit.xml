@@ -601,7 +601,8 @@
 
   $(decorateWithXooButtons);
   $(document).on('xwiki:livedata:afterEntryFetch', function (event) {
-    if ($(event.target).attr('id').indexOf("docAttachments") &gt;= 0) {
+    if ($(event.target).attr('id') === 'docAttachments') {
+      // We need to setTimeout(0) to allow the live data to display the entries before decorating them with the buttons.
       setTimeout(decorateWithXooButtons, 0);
     }
   });
