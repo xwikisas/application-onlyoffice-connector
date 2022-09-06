@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-{{html}}
+{{html clean="false"}}
 #if ($request.elem == 'oOCreateButtons')
   &lt;div id="oOCreateButtons"&gt;
     &lt;input type="button" class="btn btn-primary btn-ootext oONewText"
@@ -62,11 +62,19 @@
   }))
   #set ($actionURL = $mainDoc.getURL('view', $queryString))
   #set ($title = $escapetool.xml($services.localization.render("xoo.attachments.actions.${request.whatCanDo}")))
+  #set ($label = $escapetool.xml($services.localization.render("xoo.attachments.actions.${request.whatCanDo}.label")))
+  #if ($request.get('asLink') == 'true')
+  &lt;a class="action oOEdit" title="$title" href="$actionURL"&gt;
+    &lt;span class="action-icon"&gt;&lt;img src="$logoURL" alt="$title"/&gt;&lt;/span&gt;
+    &lt;span class="action-label"&gt;$label&lt;/span&gt;
+  &lt;/a&gt;
+  #else
   &lt;div class="btn-group xwikibuttonlinks oobutton"&gt;
     &lt;a class="oOEdit btn btn-xs btn-default" href="$actionURL" title="$title"&gt;
-      &lt;img src="$logoURL"/&gt;
+      &lt;img src="$logoURL" alt="$title"/&gt;
     &lt;/a&gt;
   &lt;/div&gt;
+  #end
 #elseif ($request.elem == 'modalContent')
   #set ($attachmentName = "${request.defaultName}${request.fileType}")
   &lt;div class="modal-popup"&gt;
