@@ -50,7 +50,7 @@ define(['jquery'], function ($) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
       if (xhr.readyState !== 4) { return; }
-      if (xhr.status != 200) {
+      if (xhr.status < 200 || xhr.status > 299) {
         callback(new Error(xhr.statusText));
         return;
       }
