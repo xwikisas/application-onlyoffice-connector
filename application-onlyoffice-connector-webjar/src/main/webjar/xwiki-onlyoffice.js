@@ -262,6 +262,7 @@ define(['jquery'], function ($) {
         onReady: onReady,
         onDownloadAs: function (evt) { saveCallbackOO(evt.data.url || evt.data); },
         onRequestEditRights: function () { docEditor.applyEditRights(true); },
+        onDocumentStateChange: function (evt) { evt.data ? $('#button-sav').prop('disabled', true) : $('#button-sav').prop('disabled', false); },
         onError: onError
       }
     });
