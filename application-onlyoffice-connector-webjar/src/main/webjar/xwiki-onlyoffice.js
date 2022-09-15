@@ -242,7 +242,7 @@ define(['jquery'], function ($) {
         },
 
         permissions: {
-          edit: ctx.config.CANEDIT,
+          edit: ctx.config.CANEDIT === 'true',
           download: true
         }
       },
