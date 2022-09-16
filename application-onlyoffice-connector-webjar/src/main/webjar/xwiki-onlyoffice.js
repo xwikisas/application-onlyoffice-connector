@@ -262,7 +262,9 @@ define(['jquery'], function ($) {
         onReady: onReady,
         onDownloadAs: function (evt) { saveCallbackOO(evt.data.url || evt.data); },
         onRequestEditRights: function () { docEditor.applyEditRights(true); },
-        onDocumentStateChange: function (evt) { evt.data ? $('#button-sav').prop('disabled', true) : $('#button-sav').prop('disabled', false); },
+        // The event.data will be true when the current user is editing the document and false when the current user's
+        // changes are sent to the document editing service.
+        onDocumentStateChange: function (evt) { $('#button-sav').prop('disabled', evt.data); },
         onError: onError
       }
     });
