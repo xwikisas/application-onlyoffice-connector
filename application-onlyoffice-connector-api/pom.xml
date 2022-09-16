@@ -42,6 +42,11 @@
       <artifactId>xwiki-platform-rest-server</artifactId>
       <version>${platform.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-office-importer</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

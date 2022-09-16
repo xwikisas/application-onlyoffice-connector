@@ -55,6 +55,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-office-ui</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <dependency>
       <groupId>com.xwiki.licensing</groupId>
       <artifactId>application-licensing-licensor-api</artifactId>
       <version>${licensing.version}</version>
