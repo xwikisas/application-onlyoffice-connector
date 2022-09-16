@@ -1074,7 +1074,7 @@ html#ooFrame {
     <property>
       <content>{{velocity}}
   {{html clean="false"}}
-  #if ($context.action == 'view')
+  #if ($xcontext.action == 'view')
     #set ($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
     #set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
     #set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
