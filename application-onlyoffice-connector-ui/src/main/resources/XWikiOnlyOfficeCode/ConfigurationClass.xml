@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWikiOnlyOfficeCode.ConfigurationClass" locale="">
+<xwikidoc version="1.4" reference="XWikiOnlyOfficeCode.ConfigurationClass" locale="">
   <web>XWikiOnlyOfficeCode</web>
   <name>ConfigurationClass</name>
   <language/>
@@ -195,6 +195,7 @@ onChange(jQuery(this).is(':checked'));
       <categoryIcon>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>categoryIcon</name>
         <number>11</number>
         <picker>0</picker>
@@ -206,9 +207,11 @@ onChange(jQuery(this).is(':checked'));
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </categoryIcon>
       <codeToExecute>
+        <contenttype>VelocityWiki</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>Text</editor>
+        <editor>---</editor>
+        <hint/>
         <name>codeToExecute</name>
         <number>7</number>
         <picker>0</picker>
@@ -224,10 +227,13 @@ onChange(jQuery(this).is(':checked'));
         <cache>0</cache>
         <classname/>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
         <hint/>
         <idField/>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>configurationClass</name>
         <number>3</number>
@@ -245,23 +251,10 @@ onChange(jQuery(this).is(':checked'));
         <valueField/>
         <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
       </configurationClass>
-      <configureGlobally>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <name>configureGlobally</name>
-        <number>4</number>
-        <prettyName>configureGlobally</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </configureGlobally>
       <displayBeforeCategory>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayBeforeCategory</name>
         <number>10</number>
         <picker>0</picker>
@@ -275,6 +268,7 @@ onChange(jQuery(this).is(':checked'));
       <displayInCategory>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayInCategory</name>
         <number>9</number>
         <picker>0</picker>
@@ -288,6 +282,7 @@ onChange(jQuery(this).is(':checked'));
       <displayInSection>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>displayInSection</name>
         <number>1</number>
         <picker>0</picker>
@@ -301,6 +296,7 @@ onChange(jQuery(this).is(':checked'));
       <heading>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>heading</name>
         <number>2</number>
         <picker>0</picker>
@@ -314,6 +310,7 @@ onChange(jQuery(this).is(':checked'));
       <iconAttachment>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>iconAttachment</name>
         <number>8</number>
         <picker>0</picker>
@@ -327,6 +324,7 @@ onChange(jQuery(this).is(':checked'));
       <linkPrefix>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>linkPrefix</name>
         <number>5</number>
         <picker>0</picker>
@@ -340,8 +338,12 @@ onChange(jQuery(this).is(':checked'));
       <propertiesToShow>
         <cache>0</cache>
         <customDisplay/>
+        <defaultValue/>
         <disabled>0</disabled>
         <displayType>input</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>propertiesToShow</name>
         <number>6</number>
@@ -358,9 +360,35 @@ onChange(jQuery(this).is(':checked'));
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
+      <scope>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
       <sectionOrder>
         <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>sectionOrder</name>
         <number>12</number>
         <numberType>integer</numberType>
@@ -382,9 +410,6 @@ onChange(jQuery(this).is(':checked'));
       <configurationClass/>
     </property>
     <property>
-      <configureGlobally>1</configureGlobally>
-    </property>
-    <property>
       <displayBeforeCategory/>
     </property>
     <property>
@@ -404,6 +429,9 @@ onChange(jQuery(this).is(':checked'));
     </property>
     <property>
       <propertiesToShow/>
+    </property>
+    <property>
+      <scope>WIKI</scope>
     </property>
     <property>
       <sectionOrder/>
