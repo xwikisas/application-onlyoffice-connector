@@ -36,9 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="Licenses.Code.VelocityMacros"/}}
-
-{{velocity}}
+  <content>{{velocity}}
 #set ($mainPageReference = $services.model.createDocumentReference('', ['XWikiOnlyOfficeCode'], 'GetKeys'))
 #set ($hasLicense = $services.licensing.licensor.hasLicensureForEntity($mainPageReference))
 #if ($hasLicense)
@@ -85,7 +83,7 @@ onChange(jQuery(this).is(':checked'));
 #end
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}
 #else
-{{error}}#getMissingLicenseMessage('xoo.extension.name'){{/error}}
+  {{missingLicenseMessage extensionName="xoo.extension.name"/}}
 #end
 {{/velocity}}</content>
   <class>
