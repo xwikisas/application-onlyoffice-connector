@@ -22,8 +22,8 @@ define(['jquery'], function ($) {
     "djvu", "doc", "docx", "epub", "fb2", "htm", "html", "mht", "odt",
     "pdf", "rtf", "txt", "xps"
   ];
-  var SPREADSHEET_EXTENSIONS = [ "ods", "csv", "xls", "xlsx" ];
-  var PRESENTATION_EXTENSIONS = [ "ppt", "pptx", "odp", "ppsx" ];
+  var SPREADSHEET_EXTENSIONS = ["ods", "csv", "xls", "xlsx"];
+  var PRESENTATION_EXTENSIONS = ["ppt", "pptx", "odp", "ppsx"];
 
   var docTypeForExtension = function (ext) {
     if (TEXT_EXTENSIONS.indexOf(ext) !== -1) {
@@ -64,7 +64,7 @@ define(['jquery'], function ($) {
     }, 30000);
   };
 
-  var httpUpload = function (url, blob, cb, method, type) {
+  var httpUpload = function (url, blob, cb, options) {
     var callback = once(cb);
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -75,9 +75,12 @@ define(['jquery'], function ($) {
       }
       callback(undefined, xhr.response);
     };
-    xhr.open(method || "POST", url);
-    if (type) {
-      xhr.setRequestHeader("Content-Type", type);
+    xhr.open(options.method || "POST", url);
+    if (options.type) {
+      xhr.setRequestHeader("Content-Type", options.type);
+    }
+    if (options.token) {
+      xhr.setRequestHeader("Authorization", "Bearer " + options.token);
     }
     xhr.send(blob);
   };
@@ -116,7 +119,7 @@ define(['jquery'], function ($) {
     });
     ctx.saveType = ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0 ?
       ctx.fileType : saveTypeForExtension(ctx.fileType);
-    if (typeof(ctx.saveType) !== 'string') {
+    if (typeof (ctx.saveType) !== 'string') {
       return;
     }
     var selectedType = $('#cnv-format').val();
@@ -177,8 +180,8 @@ define(['jquery'], function ($) {
         }
         var upURL = ctx.config.CONVERSION == 'officeServer' &&
           ctx.config.SAVABLE_EXTENSIONS.indexOf(ctx.fileType) >= 0 ?
-            ctx.config.ATTACH_URL :
-            ctx.config.REST_DOC_URL + '/attachments/' + encodeURIComponent(ctx.saveName);
+          ctx.config.ATTACH_URL :
+          ctx.config.REST_DOC_URL + '/attachments/' + encodeURIComponent(ctx.saveName);
         console.log("saving to " + upURL);
         httpUpload(upURL, dat, function (err, ret) {
           if (err) {
@@ -186,14 +189,14 @@ define(['jquery'], function ($) {
             return;
           }
           afterSave();
-        }, "PUT");
+        }, { method: "PUT"});
       });
     };
 
     var switchToSaveableFile = function () {
       var url = ('' + window.location.href);
       url = url.replace('filename=' + encodeURIComponent(ctx.config.FILENAME),
-                'filename=' + encodeURIComponent(ctx.saveName));
+        'filename=' + encodeURIComponent(ctx.saveName));
       window.location.href = url;
     };
 
@@ -214,7 +217,7 @@ define(['jquery'], function ($) {
       }, false));
       $('#button-ecv').on('click', switchToSaveableFile);
       $('#button-cnv').on('click', save(switchToSaveableFile, true));
-      $('#cnv-format').on('change', function() {
+      $('#cnv-format').on('change', function () {
         var selectedType = $(this).val();
         if (selectedType && docTypeForExtension(selectedType)) {
           ctx.saveType = selectedType;
@@ -222,13 +225,11 @@ define(['jquery'], function ($) {
         }
       });
     };
-
-    window.docEditor = docEditor = new DocsAPI.DocEditor("iframeEditor", {
+    var editorOptions = {
       width: "100%",
       height: "100%",
       type: ctx.config.CANEDIT ? 'edit' : 'view',
       documentType: docTypeForExtension(ctx.fileType),
-
       document: {
         title: ctx.config.FILENAME,
         url: ctx.localurl,
@@ -267,6 +268,24 @@ define(['jquery'], function ($) {
         onDocumentStateChange: function (evt) { $('#button-sav').prop('disabled', evt.data); },
         onError: onError
       }
+    };
+    withToken(ctx, editorOptions, function (token) {
+      editorOptions.token = token;
+      window.docEditor = docEditor = new DocsAPI.DocEditor("iframeEditor", editorOptions);
+    });
+  };
+
+  var withToken = function (ctx, options, callback) {
+    $.ajax({
+      contentType: "application/json",
+      data: JSON.stringify(options),
+      type: 'POST',
+      url: ctx.config.GETTOKEN_URL + '?outputSyntax=plain',
+      success: callback,
+      error: function (error) {
+        alert("Error while retrieving the JWT from XWiki.");
+        console.log(error);
+      }
     });
   };
 
@@ -283,7 +302,7 @@ define(['jquery'], function ($) {
   var randString = function () {
     return new Array(6).fill().map(function () {
       return Math.random().toString(32);
-    }).join('').replace(/\./g,'');
+    }).join('').replace(/\./g, '');
   };
 
   var getKey = function (config, callback) {
@@ -312,7 +331,7 @@ define(['jquery'], function ($) {
           return a;
         });
         initCtxFileInfo(ctx);
-        if (typeof(ctx.saveType) !== 'string') {
+        if (typeof (ctx.saveType) !== 'string') {
           alert("internal error: invalid save type of " + ctx.fileType);
           return;
         }
@@ -325,27 +344,37 @@ define(['jquery'], function ($) {
               alert("Unable to get the attachment from XWiki");
               return;
             }
-            var url = config.FILEUPLOAD_URL + '?url=&outputtype=&filetype=&title=&key=' +
-              ctx.key + '&vkey=' + ctx.vkey;
-            httpUpload(url, blob, function (err, ret) {
-              if (err) {
-                console.log(err);
-                alert("Unable to push attachment up to OnlyOffice server");
-                return;
-              }
-              var $ret = $(ret);
-              if ($ret.find('EndConvert').text() !== 'True' ||
-                $ret.find('Percent').text() !== '100')
-              {
-                console.log(ret);
-                alert("Unrecognized reply uploading attachment to OnlyOffice server");
-                return;
-              }
-              ctx.url = $ret.find('FileUrl').text();
-              ctx.localurl = ctx.url.replace(/^.*\/cache\/files\//,
-                               'http://localhost/cache/files/');
-              launchEditor(ctx);
-            }, "POST", blob.type);
+            var params = {
+              key: ctx.key,
+              vkey: ctx.vkey
+            };
+            var url = config.FILEUPLOAD_URL + '?' + $.param(params);
+
+            withToken(ctx, params, function (token) {
+              httpUpload(url, blob, function (err, ret) {
+                if (err) {
+                  console.log(err);
+                  alert("Unable to push attachment up to OnlyOffice server");
+                  return;
+                }
+                var $ret = $(ret);
+                if ($ret.find('EndConvert').text() !== 'True' ||
+                  $ret.find('Percent').text() !== '100') {
+                  console.log(ret);
+                  if ($ret.find('Error').text() === '-8') {
+                    alert("There was an issue with validating the token. Please make sure the OnlyOffice server " +
+                      "secret is present in the administration section.");
+                  } else {
+                    alert("Unrecognized reply uploading attachment to OnlyOffice server");
+                  }
+                  return;
+                }
+                ctx.url = $ret.find('FileUrl').text();
+                ctx.localurl = ctx.url.replace(/^.*\/cache\/files\//,
+                  'http://localhost/cache/files/');
+                launchEditor(ctx);
+              }, {method: "POST", type: blob.type, token: token});
+            });
           });
         };
         if (config.ALLOW_REALTIME) {

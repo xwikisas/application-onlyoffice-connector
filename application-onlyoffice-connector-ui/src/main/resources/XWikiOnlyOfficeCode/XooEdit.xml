@@ -184,6 +184,7 @@
             ALLOW_REALTIME: "$!ALLOW_REALTIME" === '1',
             OOAPI_PATH: "${OO_SERVER}/web-apps/apps/api/documents/api.js",
             GETKEY_URL: "$xwiki.getURL('XWikiOnlyOfficeCode.GetKeys', 'jsx')",
+            GETTOKEN_URL: "$xwiki.getURL('XWikiOnlyOfficeCode.GetToken', 'get')",
 
             // services.rest.url() doesn't work with an attachment ref
             REST_DOC_URL: "$services.rest.url($docu.documentReference)",

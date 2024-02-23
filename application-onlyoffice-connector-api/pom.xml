@@ -47,6 +47,11 @@
       <artifactId>xwiki-platform-office-importer</artifactId>
       <version>${platform.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.inversoft</groupId>
+      <artifactId>prime-jwt</artifactId>
+      <version>1.3.1</version>
+    </dependency>
   </dependencies>
 
 </project>
