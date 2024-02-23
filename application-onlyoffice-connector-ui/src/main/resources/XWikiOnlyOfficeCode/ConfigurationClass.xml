@@ -45,11 +45,11 @@
 #set ($config = $paramDoc.getObject($paramClass))
 #if ($xcontext.isMainWiki())
 #set ($params = {
-  'general': ['onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion']
+  'general': ['onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion', 'serverSecret']
 })
 #else
 #set ($params = {
-  'general': ['useGlobalConfig', 'onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion']
+  'general': ['useGlobalConfig', 'onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion', 'serverSecret']
 })
 {{html clean='false'}}
 &lt;script&gt;
@@ -161,6 +161,22 @@ onChange(jQuery(this).is(':checked'));
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </onlyOfficeServer>
+    <serverSecret>
+      <algorithm/>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>serverSecret</name>
+      <number>6</number>
+      <picker>1</picker>
+      <prettyName>serverSecret</prettyName>
+      <size>30</size>
+      <storageType>Clear</storageType>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
+    </serverSecret>
     <useGlobalConfig>
       <customDisplay/>
       <defaultValue/>
@@ -515,6 +531,22 @@ onChange(jQuery(this).is(':checked'));
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </onlyOfficeServer>
+      <serverSecret>
+        <algorithm/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>serverSecret</name>
+        <number>6</number>
+        <picker>1</picker>
+        <prettyName>serverSecret</prettyName>
+        <size>30</size>
+        <storageType/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
+      </serverSecret>
       <useGlobalConfig>
         <customDisplay/>
         <defaultValue/>
@@ -541,6 +573,9 @@ onChange(jQuery(this).is(':checked'));
     </property>
     <property>
       <onlyOfficeServer>https://onlyoffice.xwiki.com</onlyOfficeServer>
+    </property>
+    <property>
+      <serverSecret/>
     </property>
     <property>
       <useGlobalConfig>1</useGlobalConfig>
