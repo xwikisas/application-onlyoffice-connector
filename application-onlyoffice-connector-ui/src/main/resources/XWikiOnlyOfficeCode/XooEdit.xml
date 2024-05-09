@@ -180,10 +180,12 @@
             ATTACH_URL: "$attachUrl".replace('dateOfToday', new Date().getTime()),
             FILEUPLOAD_URL: "${OO_SERVER}/FileUploader.ashx",
             CONVERSION: "$OO_CONVERSION",
+            NETFLUX_WEBSOCKET: $jsontool.serialize($services.websocket.url('netflux')),
+            NETFLUX_CLIENT: $jsontool.serialize($services.webjars.url('org.xwiki.contrib:netflux-websocket-webjar', 'netflux-client.min.js')),
+            CHANNEL_REST: "${services.rest.url($doc.documentReference)}/channels",
             // Realtime
             ALLOW_REALTIME: "$!ALLOW_REALTIME" === '1',
             OOAPI_PATH: "${OO_SERVER}/web-apps/apps/api/documents/api.js",
-            GETKEY_URL: "$xwiki.getURL('XWikiOnlyOfficeCode.GetKeys', 'jsx')",
             GETTOKEN_URL: "$xwiki.getURL('XWikiOnlyOfficeCode.GetToken', 'get')",
 
             // services.rest.url() doesn't work with an attachment ref
