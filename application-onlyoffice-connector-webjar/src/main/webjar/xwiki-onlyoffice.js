@@ -189,7 +189,7 @@ define(['jquery'], function ($) {
             return;
           }
           afterSave();
-        }, { method: "PUT"});
+        }, { method: "PUT" });
       });
     };
 
@@ -238,8 +238,8 @@ define(['jquery'], function ($) {
         vkey: ctx.vkey,
 
         info: {
-          author: ctx.config.USERNAME,
-          created: ctx.config.CREATION_DATE
+          owner: ctx.config.USERNAME,
+          uploaded: ctx.config.CREATION_DATE
         },
 
         permissions: {
@@ -305,12 +305,6 @@ define(['jquery'], function ($) {
     }).join('').replace(/\./g, '');
   };
 
-  var getKey = function (config, callback) {
-    require([config.GETKEY_URL], function (Keys) {
-      Keys.getKey(config.DOC_REFERENCE, config.FILENAME, callback);
-    });
-  };
-
   return function (config) {
     require([config.OOAPI_PATH], function () {
       $(function () {
@@ -373,16 +367,40 @@ define(['jquery'], function ($) {
                 ctx.localurl = ctx.url.replace(/^.*\/cache\/files\//,
                   'http://localhost/cache/files/');
                 launchEditor(ctx);
-              }, {method: "POST", type: blob.type, token: token});
+              }, { method: "POST", type: blob.type, token: token });
             });
           });
         };
+        // Init a random key. Used if realtime is disabled or if it fails.
+        var vkey = randString() + '_' + new Date().getTime() + '.' + ctx.fileType;
+        var key = vkey.slice(0, 20);
         if (config.ALLOW_REALTIME) {
-          getKey(config, loadRealtimeOO);
-        }
-        else {
-          var vkey = randString() + '_' + new Date().getTime() + '.' + ctx.fileType;
-          var key = vkey.slice(0, 20);
+          // We want to create a channel and use the key for each document editing session.
+          // If all the connections to the channel are closed, we want another id when editing the same document again.
+          require([config.NETFLUX_CLIENT], function () {
+            require(['netflux-client'], function (Netflux) {
+              Netflux.connect(config.NETFLUX_WEBSOCKET)
+                .then(function (network) {
+                  var channelsRestURL = config.CHANNEL_REST;
+                  $.getJSON(channelsRestURL, $.param({
+                    path: config.FILENAME + "/xoo",
+                    create: true
+                  }, true)).done(channels => {
+                    network.join(channels[0].key);
+                    loadRealtimeOO(channels[0].key);
+                  }).fail(function () {
+                    alert("Failed to retrieve the key to join the realtime channel. Opening the editor without " +
+                      "realtime support.");
+                    loadRealtimeOO(key);
+                  });
+                })
+                .catch(function () {
+                  alert("Could not connect to the websocket. Opening the editor without realtime support.");
+                  loadRealtimeOO(key);
+                });
+            });
+          });
+        } else {
           loadRealtimeOO(key);
         }
       });
