@@ -80,7 +80,7 @@ define(['jquery'], function ($) {
       xhr.setRequestHeader("Content-Type", options.type);
     }
     if (options.token) {
-      xhr.setRequestHeader("Authorization", "Bearer " + options.token);
+      xhr.setRequestHeader(options.authHeader || "Authorization", "Bearer " + options.token);
     }
     xhr.send(blob);
   };
@@ -367,7 +367,7 @@ define(['jquery'], function ($) {
                 ctx.localurl = ctx.url.replace(/^.*\/cache\/files\//,
                   'http://localhost/cache/files/');
                 launchEditor(ctx);
-              }, { method: "POST", type: blob.type, token: token });
+              }, { method: "POST", type: blob.type, token: token, authHeader: ctx.config.AUTH_HEADER });
             });
           });
         };

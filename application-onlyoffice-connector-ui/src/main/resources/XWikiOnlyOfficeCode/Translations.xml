@@ -69,7 +69,11 @@ xoo.config.conversion.officeServerWarning=The XWiki instance is not connected to
 XWikiOnlyOfficeCode.ConfigurationClass_conversion=Conversion of ODF documents when editing
 XWikiOnlyOfficeCode.ConfigurationClass_conversion_force=Convert to a different document
 XWikiOnlyOfficeCode.ConfigurationClass_conversion_onlyoffice=(Beta) On the fly using OnlyOffice
-XWikiOnlyOfficeCode.ConfigurationClass_conversion_officeServer=(Beta) On the fly using Office Server</content>
+XWikiOnlyOfficeCode.ConfigurationClass_conversion_officeServer=(Beta) On the fly using Office Server
+XWikiOnlyOfficeCode.ConfigurationClass_serverSecret=Server secret
+XWikiOnlyOfficeCode.ConfigurationClass_serverSecret_hint=The secret configured on the OnlyOffice server that will enable XWiki to create JWT tokens.
+XWikiOnlyOfficeCode.ConfigurationClass_authorizationHeader=Authorization Header
+XWikiOnlyOfficeCode.ConfigurationClass_authorizationHeader_hint=The request header that will contain the authorization token when sending data to OnlyOffice.</content>
   <object>
     <name>XWikiOnlyOfficeCode.Translations</name>
     <number>0</number>

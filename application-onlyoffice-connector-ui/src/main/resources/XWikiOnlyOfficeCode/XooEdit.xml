@@ -66,6 +66,7 @@
   #set ($discard = $EDITABLE_FILETYPES.addAll(['.odt', '.ods', '.odp']))
   #set ($ODF_FILETYPES = {'.odt': '.docx', '.ods': '.xlsx', '.odp': '.odp'})
 #end
+#set ($OO_AUTH_HEADER = $OO_CONF_OBJ.getProperty('authorizationHeader').getValue())
 ##
 #if ("$!request.document" == '')
   $escapetool.xml($services.localization.render('xoo.validation.documentMissing'))
@@ -187,7 +188,7 @@
             ALLOW_REALTIME: "$!ALLOW_REALTIME" === '1',
             OOAPI_PATH: "${OO_SERVER}/web-apps/apps/api/documents/api.js",
             GETTOKEN_URL: "$xwiki.getURL('XWikiOnlyOfficeCode.GetToken', 'get')",
-
+            AUTH_HEADER: "$OO_AUTH_HEADER",
             // services.rest.url() doesn't work with an attachment ref
             REST_DOC_URL: "$services.rest.url($docu.documentReference)",
 

@@ -45,11 +45,11 @@
 #set ($config = $paramDoc.getObject($paramClass))
 #if ($xcontext.isMainWiki())
 #set ($params = {
-  'general': ['onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion', 'serverSecret']
+  'general': ['onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion', 'serverSecret', 'authorizationHeader']
 })
 #else
 #set ($params = {
-  'general': ['useGlobalConfig', 'onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion', 'serverSecret']
+  'general': ['useGlobalConfig', 'onlyOfficeServer', 'enableCreation', 'enableRealtime', 'conversion', 'serverSecret', 'authorizationHeader']
 })
 {{html clean='false'}}
 &lt;script&gt;
@@ -95,6 +95,20 @@ onChange(jQuery(this).is(':checked'));
     <defaultWeb/>
     <nameField/>
     <validationScript/>
+    <authorizationHeader>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>authorizationHeader</name>
+      <number>7</number>
+      <picker>1</picker>
+      <prettyName>authorizationHeader</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </authorizationHeader>
     <conversion>
       <cache>0</cache>
       <customDisplay/>
@@ -465,6 +479,20 @@ onChange(jQuery(this).is(':checked'));
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <authorizationHeader>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>authorizationHeader</name>
+        <number>7</number>
+        <picker>1</picker>
+        <prettyName>authorizationHeader</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </authorizationHeader>
       <conversion>
         <cache>0</cache>
         <customDisplay/>
@@ -562,6 +590,9 @@ onChange(jQuery(this).is(':checked'));
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </useGlobalConfig>
     </class>
+    <property>
+      <authorizationHeader>Authorization</authorizationHeader>
+    </property>
     <property>
       <conversion>force</conversion>
     </property>
