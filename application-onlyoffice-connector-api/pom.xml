@@ -27,6 +27,12 @@
     <artifactId>application-onlyoffice-connector</artifactId>
     <version>2.3.2-SNAPSHOT</version>
   </parent>
+  <properties>
+    <!--  Added in 2.3.2. To be removed after several versions. It was added because the websocket scriptservice
+      of this extension, which used to be a dependency, was overriding the script service coming from core (they had
+      the same hint).  -->
+    <xwiki.extension.features>org.xwiki.contrib:xwiki-contrib-websocket</xwiki.extension.features>
+  </properties>
   <artifactId>application-onlyoffice-connector-api</artifactId>
   <packaging>jar</packaging>
   <name>OnlyOffice Connector - API</name>
