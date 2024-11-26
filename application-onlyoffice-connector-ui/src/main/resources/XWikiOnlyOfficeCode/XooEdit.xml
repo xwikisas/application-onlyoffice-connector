@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWikiOnlyOfficeCode.XooEdit" locale="">
+<xwikidoc version="1.5" reference="XWikiOnlyOfficeCode.XooEdit" locale="">
   <web>XWikiOnlyOfficeCode</web>
   <name>XooEdit</name>
   <language/>
@@ -377,6 +377,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -421,7 +422,7 @@
       </use>
     </class>
     <property>
-      <cache/>
+      <cache>long</cache>
     </property>
     <property>
       <code>require(['jquery'],function($) {
@@ -547,12 +548,9 @@
       canDoByExt[x] = 'view';
     });
 
-    // Attachments are displayed using a live table since 14.6.
-    var hasPagination = $("#_attachments table").length &gt; 0;
-
     $("#_attachments span.name").each(function(i, elem) {
-      var searchPoint = hasPagination ? $(elem).closest('tr').find('.attachmentActions') : elem.parentNode;
-
+      // Attachments are displayed using a livedata since 14.8.
+      const searchPoint = $(elem).closest('tr').find('.attachmentActions');
       if ($(searchPoint).find('a.oOEdit').length) {
         return;
       }
@@ -565,6 +563,7 @@
       if (!hasEditRights) {
         whatCanDo = 'view';
       }
+      var hasPagination = $("#_attachments table").length &gt; 0;
 
       var queryString = $.param({
         'elem': 'oOActionButtons',
@@ -601,7 +600,6 @@
     }
   };
 
-  $(decorateWithXooButtons);
   $(document).on('xwiki:livedata:afterEntryFetch', function (event) {
     if ($(event.target).attr('id') === 'docAttachments') {
       // We need to setTimeout(0) to allow the live data to display the entries before decorating them with the buttons.
@@ -663,6 +661,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -839,6 +838,7 @@ html#ooFrame {
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -990,7 +990,7 @@ html#ooFrame {
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1010,6 +1010,7 @@ html#ooFrame {
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -1040,6 +1041,7 @@ html#ooFrame {
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
