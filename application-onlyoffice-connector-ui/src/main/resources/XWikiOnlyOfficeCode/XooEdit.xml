@@ -549,7 +549,6 @@
     });
 
     $("#_attachments span.name").each(function(i, elem) {
-      // Attachments are displayed using a livedata since 14.8.
       const searchPoint = $(elem).closest('tr').find('.attachmentActions');
       if ($(searchPoint).find('a.oOEdit').length) {
         return;
