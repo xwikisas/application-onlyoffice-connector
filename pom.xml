@@ -41,6 +41,7 @@
     <licensing.version>1.27</licensing.version>
   </properties>
   <modules>
+    <module>application-onlyoffice-connector-websocket</module>
     <module>application-onlyoffice-connector-api</module>
     <module>application-onlyoffice-connector-ui</module>
     <module>application-onlyoffice-connector-webjar</module>

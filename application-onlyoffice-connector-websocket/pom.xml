@@ -27,39 +27,22 @@
     <artifactId>application-onlyoffice-connector</artifactId>
     <version>2.4.1-SNAPSHOT</version>
   </parent>
-  <artifactId>application-onlyoffice-connector-api</artifactId>
+  <properties>
+    <!--  To be removed after several releases or once this app depends on a XWiki parent >=
+      17.x. It was added because the websocket scriptservice of this extension, which used to be a dependency, was
+      overriding the script service coming from core (they had the same hint).  -->
+    <xwiki.extension.features>org.xwiki.contrib:xwiki-contrib-websocket</xwiki.extension.features>
+  </properties>
+  <artifactId>application-onlyoffice-connector-websocket</artifactId>
+  <version>2.4.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>OnlyOffice Connector - API</name>
-  <description>API needed by the OnlyOffice Connector.</description>
+  <name>OnlyOffice Connector - Websocket</name>
+  <description>Websocket needed by the OnlyOffice Connector.</description>
   <dependencies>
-    <!-- Should be replaced with the xwiki-platform-websocket dependency. Check
-      https://github.com/xwikisas/application-onlyoffice-connector/issues/50 for more details. -->
-    <dependency>
-      <groupId>com.xwiki.onlyoffice-connector</groupId>
-      <artifactId>application-onlyoffice-connector-websocket</artifactId>
-      <version>${project.version}</version>
-      <optional>true</optional>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-websocket</artifactId>
       <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rest-server</artifactId>
-      <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-office-importer</artifactId>
-      <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.inversoft</groupId>
-      <artifactId>prime-jwt</artifactId>
-      <version>1.3.1</version>
     </dependency>
   </dependencies>
-
 </project>
