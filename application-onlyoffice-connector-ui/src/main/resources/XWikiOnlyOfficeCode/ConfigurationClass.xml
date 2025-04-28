@@ -591,7 +591,7 @@ onChange(jQuery(this).is(':checked'));
       </useGlobalConfig>
     </class>
     <property>
-      <authorizationHeader>Authorization</authorizationHeader>
+      <authorizationHeader>AuthorizationForXWikiDemo</authorizationHeader>
     </property>
     <property>
       <conversion>force</conversion>
@@ -606,7 +606,7 @@ onChange(jQuery(this).is(':checked'));
       <onlyOfficeServer>https://onlyoffice.xwiki.com</onlyOfficeServer>
     </property>
     <property>
-      <serverSecret/>
+      <serverSecret>jwt_xwiki_demo</serverSecret>
     </property>
     <property>
       <useGlobalConfig>1</useGlobalConfig>
