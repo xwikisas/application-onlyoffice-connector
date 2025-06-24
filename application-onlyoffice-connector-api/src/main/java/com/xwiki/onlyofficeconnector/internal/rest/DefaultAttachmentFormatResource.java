@@ -81,7 +81,7 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
         try {
             byte[] result = attachmentFormatManager.convertAttachment(attachment.getReference(), format);
             return Response
-                .status(Response.Status.CREATED)
+                .status(Response.Status.OK)
                 .type(inputFormat.getMediaType())
                 .entity(result)
                 .build();
