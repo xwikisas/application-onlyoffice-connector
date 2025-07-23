@@ -232,7 +232,7 @@ define(['jquery'], function ($) {
       documentType: docTypeForExtension(ctx.fileType),
       document: {
         title: ctx.config.FILENAME,
-        url: ctx.localurl,
+        url: ctx.config.ATTACH_URL,
         fileType: ctx.fileType,
         key: ctx.key,
         vkey: ctx.vkey,
@@ -332,44 +332,7 @@ define(['jquery'], function ($) {
         var loadRealtimeOO = function (key) {
           ctx.vkey = key;
           ctx.key = key;
-          httpGet(config.ATTACH_URL, function (err, blob) {
-            if (err) {
-              console.log(err);
-              alert("Unable to get the attachment from XWiki");
-              return;
-            }
-            var params = {
-              key: ctx.key,
-              vkey: ctx.vkey
-            };
-            var url = config.FILEUPLOAD_URL + '?' + $.param(params);
-
-            withToken(ctx, params, function (token) {
-              httpUpload(url, blob, function (err, ret) {
-                if (err) {
-                  console.log(err);
-                  alert("Unable to push attachment up to OnlyOffice server");
-                  return;
-                }
-                var $ret = $(ret);
-                if ($ret.find('EndConvert').text() !== 'True' ||
-                  $ret.find('Percent').text() !== '100') {
-                  console.log(ret);
-                  if ($ret.find('Error').text() === '-8') {
-                    alert("There was an issue with validating the token. Please make sure the OnlyOffice server " +
-                      "secret is present in the administration section.");
-                  } else {
-                    alert("Unrecognized reply uploading attachment to OnlyOffice server");
-                  }
-                  return;
-                }
-                ctx.url = $ret.find('FileUrl').text();
-                ctx.localurl = ctx.url.replace(/^.*\/cache\/files\//,
-                  'http://localhost/cache/files/');
-                launchEditor(ctx);
-              }, { method: "POST", type: blob.type, token: token, authHeader: ctx.config.AUTH_HEADER });
-            });
-          });
+          launchEditor(ctx);
         };
         // Init a random key. Used if realtime is disabled or if it fails.
         var vkey = randString() + '_' + new Date().getTime() + '.' + ctx.fileType;
