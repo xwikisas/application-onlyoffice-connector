@@ -603,20 +603,25 @@
       timeout = 5000) {
     let lastCount = 0;
     let sameCountTicks = 0;
-    const startTime = Date.now();
+    const startTime = performance.now();
     const interval = setInterval(() =&gt; {
       const currentCount = $(selector).length;
+      // As the attachments info are loaded sequentially, we check if the last counted value is the same as
+      // the current number of entries found. If the values are the same, we increment sameCountTicks.
+      // Otherwise, we reset it to 0.
       if (currentCount === lastCount) {
         sameCountTicks++;
       } else {
         sameCountTicks = 0;
       }
       lastCount = currentCount;
+      // We consider that all the entries have been loaded if the last counted value is the same as
+      // the current number of entries found at least the number of times represented by stableCount.
       if (sameCountTicks &gt;= stableCount) {
         clearInterval(interval);
         callback();
       }
-      if (Date.now() - startTime &gt; timeout) {
+      if (performance.now() - startTime &gt; timeout) {
         clearInterval(interval);
         console.warn('Interval timed out while waiting for attachments live data entries to load.');
       }
