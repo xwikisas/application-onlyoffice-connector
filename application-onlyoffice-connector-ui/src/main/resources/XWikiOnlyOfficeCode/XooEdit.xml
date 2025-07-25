@@ -447,7 +447,7 @@
       return name;
     }
     while (list.indexOf(name + ' - ' + untitledIndex + fileType) !== -1) {
-      untitledIndex++; 
+      untitledIndex++;
     }
     return name + ' - ' + untitledIndex;
   };
@@ -534,9 +534,9 @@
     var editableFormats = ['docx', 'xlsx', 'pptx'];
     var convertibleFormats = ['xls', 'csv', 'doc', 'ppt', 'pps', 'ppsx', 'rtf', 'txt', 'mht', 'html', 'htm'];
     if (!forcedConversion) {
-        editableFormats.push('odt', 'ods', 'odp');
+      editableFormats.push('odt', 'ods', 'odp');
     } else {
-        convertibleFormats.push('odt', 'ods', 'odp');
+      convertibleFormats.push('odt', 'ods', 'odp');
     }
     editableFormats.forEach(function(x) {
       canDoByExt[x] = 'edit';
@@ -599,10 +599,35 @@
     }
   };
 
+  var waitForAttachmentsAndDecorate = function (selector, callback, checkInterval = 10, stableCount = 5,
+      timeout = 5000) {
+    let lastCount = 0;
+    let sameCountTicks = 0;
+    const startTime = Date.now();
+    const interval = setInterval(() =&gt; {
+      const currentCount = $(selector).length;
+      if (currentCount === lastCount) {
+        sameCountTicks++;
+      } else {
+        sameCountTicks = 0;
+      }
+      lastCount = currentCount;
+      if (sameCountTicks &gt;= stableCount) {
+        clearInterval(interval);
+        callback();
+      }
+      if (Date.now() - startTime &gt; timeout) {
+        clearInterval(interval);
+        console.warn('Interval timed out while waiting for attachments live data entries to load.');
+      }
+    }, checkInterval);
+  }
+
   $(document).on('xwiki:livedata:afterEntryFetch', function (event) {
     if ($(event.target).attr('id') === 'docAttachments') {
-      // We need to setTimeout(0) to allow the live data to display the entries before decorating them with the buttons.
-      setTimeout(decorateWithXooButtons, 0);
+      // We need to create an interval to check if the entries of the livedata are loaded before decorating them
+      // with the buttons.
+      waitForAttachmentsAndDecorate("#_attachments span.name", decorateWithXooButtons);
     }
   });
   $(document).on('xwiki:livetable:docAttachments:loadingComplete', decorateWithXooButtons);
