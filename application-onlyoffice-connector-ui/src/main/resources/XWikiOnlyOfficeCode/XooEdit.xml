@@ -447,7 +447,7 @@
       return name;
     }
     while (list.indexOf(name + ' - ' + untitledIndex + fileType) !== -1) {
-      untitledIndex++; 
+      untitledIndex++;
     }
     return name + ' - ' + untitledIndex;
   };
@@ -534,9 +534,9 @@
     var editableFormats = ['docx', 'xlsx', 'pptx'];
     var convertibleFormats = ['xls', 'csv', 'doc', 'ppt', 'pps', 'ppsx', 'rtf', 'txt', 'mht', 'html', 'htm'];
     if (!forcedConversion) {
-        editableFormats.push('odt', 'ods', 'odp');
+      editableFormats.push('odt', 'ods', 'odp');
     } else {
-        convertibleFormats.push('odt', 'ods', 'odp');
+      convertibleFormats.push('odt', 'ods', 'odp');
     }
     editableFormats.forEach(function(x) {
       canDoByExt[x] = 'edit';
@@ -599,10 +599,40 @@
     }
   };
 
+  var waitForAttachmentsAndDecorate = function (selector, callback, checkInterval = 10, stableCount = 5,
+      timeout = 5000) {
+    let lastCount = 0;
+    let sameCountTicks = 0;
+    const startTime = performance.now();
+    const interval = setInterval(() =&gt; {
+      const currentCount = $(selector).length;
+      // As the attachments info are loaded sequentially, we check if the last counted value is the same as
+      // the current number of entries found. If the values are the same, we increment sameCountTicks.
+      // Otherwise, we reset it to 0.
+      if (currentCount === lastCount) {
+        sameCountTicks++;
+      } else {
+        sameCountTicks = 0;
+      }
+      lastCount = currentCount;
+      // We consider that all the entries have been loaded if the last counted value is the same as
+      // the current number of entries found at least the number of times represented by stableCount.
+      if (sameCountTicks &gt;= stableCount) {
+        clearInterval(interval);
+        callback();
+      }
+      if (performance.now() - startTime &gt; timeout) {
+        clearInterval(interval);
+        console.warn('Interval timed out while waiting for attachments live data entries to load.');
+      }
+    }, checkInterval);
+  }
+
   $(document).on('xwiki:livedata:afterEntryFetch', function (event) {
     if ($(event.target).attr('id') === 'docAttachments') {
-      // We need to setTimeout(0) to allow the live data to display the entries before decorating them with the buttons.
-      setTimeout(decorateWithXooButtons, 0);
+      // We need to create an interval to check if the entries of the livedata are loaded before decorating them
+      // with the buttons.
+      waitForAttachmentsAndDecorate("#_attachments span.name", decorateWithXooButtons);
     }
   });
   $(document).on('xwiki:livetable:docAttachments:loadingComplete', decorateWithXooButtons);
