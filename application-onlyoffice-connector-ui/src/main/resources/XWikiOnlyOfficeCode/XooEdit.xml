@@ -618,12 +618,9 @@
       }
 
       const currentCount = $(selector).length;
-      if (numberOfEntries !== undefined) {
-        if (currentCount === numberOfEntries) {
-          clearInterval(interval);
-          decorateWithXooButtons();
-        }
-        return;
+      if (numberOfEntries !== undefined &amp;&amp; currentCount === numberOfEntries) {
+        clearInterval(interval);
+        decorateWithXooButtons();
       }
 
       // As the attachments info are loaded sequentially, we check if the last counted value is the same as
@@ -647,7 +644,7 @@
 
   $(document).on('xwiki:livedata:entriesUpdated', function (event) {
     if ($(event.target).attr('id') === 'docAttachments') {
-      waitForAttachmentsAndDecorate("#_attachments span.name", event.detail.livedata.data?.data.entries.length);
+      waitForAttachmentsAndDecorate("#_attachments span.name", event.detail.livedata.data?.data?.entries.length);
     }
   });
   $(document).on('xwiki:livetable:docAttachments:loadingComplete', decorateWithXooButtons);
