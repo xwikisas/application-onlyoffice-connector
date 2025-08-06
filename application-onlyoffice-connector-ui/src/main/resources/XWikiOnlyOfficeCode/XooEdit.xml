@@ -1123,7 +1123,12 @@ html#ooFrame {
     #set ($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
     #set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
     #set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
-
+    #set ($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').getValue())
+    #if ("$!OO_USE_GLOBAL_CONFIG" != "0" )
+      #set ($OO_CONF_REF = $services.model.createDocumentReference($xcontext.getMainWikiName(), 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
+      #set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
+      #set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
+    #end
     #set ($enableCreate = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == '1')
     #set ($forcedConversion = "$!OO_CONF_OBJ.getProperty('conversion').getValue()" == 'force')
     #set ($config = {
