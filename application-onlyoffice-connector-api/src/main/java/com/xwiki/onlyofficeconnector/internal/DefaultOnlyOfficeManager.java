@@ -103,7 +103,6 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
         XWikiContext context = contextProvider.get();
 
         try {
-            wikiDescriptorManager.getMainWikiDescriptor().getReference();
             XWikiDocument document = context.getWiki().getDocument(CONFIG_REFERENCE, context);
             BaseObject baseObject = document.getXObject(CONFIG_CLASS_REFERENCE);
             if (baseObject.getStringValue("useGlobalConfig").equals("0")) {
