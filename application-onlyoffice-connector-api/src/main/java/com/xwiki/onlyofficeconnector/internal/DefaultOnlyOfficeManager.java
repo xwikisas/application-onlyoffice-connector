@@ -33,10 +33,12 @@ import org.primeframework.jwt.hmac.HMACSigner;
 import org.primeframework.jwt.hmac.HMACVerifier;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xwiki.onlyofficeconnector.OnlyOfficeManager;
@@ -55,11 +57,16 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
 
     private static final LocalDocumentReference CONFIG_CLASS_REFERENCE = CONFIG_REFERENCE;
 
+    private static final String SERVER_SECRET_KEY = "serverSecret";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public String createToken(final Map<String, Object> payloadClaims)
@@ -98,8 +105,16 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
         try {
             XWikiDocument document = context.getWiki().getDocument(CONFIG_REFERENCE, context);
             BaseObject baseObject = document.getXObject(CONFIG_CLASS_REFERENCE);
-            return baseObject.getStringValue("serverSecret");
-        } catch (XWikiException e) {
+            if (baseObject.getStringValue("useGlobalConfig").equals("0")) {
+                return baseObject.getStringValue(SERVER_SECRET_KEY);
+            } else {
+                WikiReference wikiReference = wikiDescriptorManager.getMainWikiDescriptor().getReference();
+                DocumentReference mainWikiConfigRef = new DocumentReference(CONFIG_REFERENCE, wikiReference);
+                XWikiDocument mainWikiDoc = context.getWiki().getDocument(mainWikiConfigRef, context);
+                BaseObject mainWikiBaseObject = mainWikiDoc.getXObject(CONFIG_CLASS_REFERENCE);
+                return mainWikiBaseObject.getStringValue(SERVER_SECRET_KEY);
+            }
+        } catch (Exception e) {
             logger.warn("Failed to retrieve the secret for generating/verifying a JWT.");
             return "";
         }
