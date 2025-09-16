@@ -206,9 +206,15 @@ define(['jquery'], function ($) {
       ready = true;
       console.log("Document editor ready2");
       $('#button-cancel').on('click', function () {
+        if (window.docEditor && window.docEditor.xwikiEdited && !confirm("Canceling without saving! Continue?")) {
+          return;
+        }
         window.location.href = ctx.config.DOCU_VIEW_URL;
       });
       $('#button-sac').on('click', save(function () {
+        if (window.docEditor) {
+          window.docEditor.xwikiEdited = false;
+        }
         console.log("saved");
       }, false));
       $('#button-sav').on('click', save(function () {
@@ -265,7 +271,12 @@ define(['jquery'], function ($) {
         onRequestEditRights: function () { docEditor.applyEditRights(true); },
         // The event.data will be true when the current user is editing the document and false when the current user's
         // changes are sent to the document editing service.
-        onDocumentStateChange: function (evt) { $('#button-sav').prop('disabled', evt.data); },
+        onDocumentStateChange: function (evt) {
+          $('#button-sav').prop('disabled', evt.data);
+          if (window.docEditor) {
+            window.docEditor.xwikiEdited = true;
+          }
+        },
         onError: onError
       }
     };
