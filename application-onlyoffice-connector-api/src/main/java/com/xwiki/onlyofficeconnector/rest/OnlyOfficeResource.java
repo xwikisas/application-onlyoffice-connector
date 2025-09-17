@@ -17,47 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package com.xwiki.onlyofficeconnector.rest;
 
-package com.xwiki.onlyofficeconnector;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
-import java.util.Map;
-
-import org.primeframework.jwt.domain.JWT;
-import org.xwiki.component.annotation.Role;
+import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.rest.XWikiRestException;
 import org.xwiki.stability.Unstable;
 
 /**
- * Manages server side operations for the OnlyOffice integration.
+ * Provides necessary endpoints for the only office application.
  *
  * @version $Id$
- * @since 2.2.0
+ * @since 2.5.0
  */
-@Role
 @Unstable
-public interface OnlyOfficeManager
+@Path("/onlyoffice/attachment")
+public interface OnlyOfficeResource extends XWikiRestComponent
 {
     /**
-     * Create a JWT for a given set of claims.
+     * Return the XWiki attachment content with code 200. Return code 401 if the authorization token is invalid.
      *
-     * @param payloadClaims the claims that will be added to the JWT.
-     * @return the encoded JWT.
+     * @param attachRef the reference of the attachment for which the content is to be retrieved.
+     * @return the attachment content
+     * @throws XWikiRestException if an internal error occurs.
      */
-    String createToken(Map<String, Object> payloadClaims);
-
-    /**
-     * Decode an encoded JWT.
-     *
-     * @param token the encoded JWT.
-     * @return the JWT object that.
-     */
-    JWT readToken(String token);
-
-    /**
-     * Get the authorization header from the only office configuration.
-     *
-     * @return the authorization header
-     * @since 2.5.0
-     */
-    @Unstable
-    String getAuthorizationHeader();
+    @GET
+    @Path("/content")
+    Response getContent(@QueryParam("attach_ref") String attachRef) throws XWikiRestException;
 }

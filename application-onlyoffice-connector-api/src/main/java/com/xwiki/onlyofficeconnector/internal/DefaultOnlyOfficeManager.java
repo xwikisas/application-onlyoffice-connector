@@ -59,6 +59,12 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
 
     private static final String SERVER_SECRET_KEY = "serverSecret";
 
+    private static final String AUTHORIZATION_HEADER_KEY = "authorizationHeader";
+
+    private static final String DEFAULT_AUTHORIZATION_HEADER = "Authorization";
+
+    private static final String GLOBAL_CONFIG_KEY = "useGlobalConfig";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -98,6 +104,33 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
         }
     }
 
+    @Override
+    public String getAuthorizationHeader()
+    {
+        try {
+            XWikiContext context = contextProvider.get();
+            XWikiDocument document = context.getWiki().getDocument(CONFIG_REFERENCE, context);
+            BaseObject baseObject = document.getXObject(CONFIG_CLASS_REFERENCE);
+            String authorizationHeader;
+            if (baseObject.getStringValue(GLOBAL_CONFIG_KEY).equals("0")) {
+                authorizationHeader = baseObject.getStringValue(AUTHORIZATION_HEADER_KEY);
+            } else {
+                WikiReference wikiReference = wikiDescriptorManager.getMainWikiDescriptor().getReference();
+                DocumentReference mainWikiConfigRef = new DocumentReference(CONFIG_REFERENCE, wikiReference);
+                XWikiDocument mainWikiDoc = context.getWiki().getDocument(mainWikiConfigRef, context);
+                BaseObject mainWikiBaseObject = mainWikiDoc.getXObject(CONFIG_CLASS_REFERENCE);
+                authorizationHeader = mainWikiBaseObject.getStringValue(AUTHORIZATION_HEADER_KEY);
+            }
+            if (authorizationHeader == null || authorizationHeader.isEmpty()) {
+                authorizationHeader = DEFAULT_AUTHORIZATION_HEADER;
+            }
+            return authorizationHeader;
+        } catch (Exception e) {
+            logger.warn("Failed to retrieve the authorization header from the only office configuration.");
+            return "";
+        }
+    }
+
     private String getSecret()
     {
         XWikiContext context = contextProvider.get();
@@ -105,7 +138,7 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
         try {
             XWikiDocument document = context.getWiki().getDocument(CONFIG_REFERENCE, context);
             BaseObject baseObject = document.getXObject(CONFIG_CLASS_REFERENCE);
-            if (baseObject.getStringValue("useGlobalConfig").equals("0")) {
+            if (baseObject.getStringValue(GLOBAL_CONFIG_KEY).equals("0")) {
                 return baseObject.getStringValue(SERVER_SECRET_KEY);
             } else {
                 WikiReference wikiReference = wikiDescriptorManager.getMainWikiDescriptor().getReference();

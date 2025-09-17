@@ -173,13 +173,13 @@
           }
         }
         #set ($instanceUrl = $stringtool.replace($request.requestURL, $request.requestURI, ''))
-        #set ($attachUrl = "$docu.getAttachmentURL($filename,'download','cb=dateOfToday')")
+        #set ($attachUrl = "/xwiki/rest/onlyoffice/attachment/content?attach_ref=$services.model.serialize($attachment.getReference(), 'default')")
         #if ($OO_CONVERSION == 'officeServer' &amp;&amp; $mode == 'edit')
           #set ($attachUrl = "${services.rest.url($docu.documentReference)}/attachments/${filename}/formats/${ODF_FILETYPES.get($fileType).substring(1)}?fallback=true&amp;cb=dateOfToday")
         #end
         require(["$services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', 'xwiki-onlyoffice.js', { 'cb': 'dateOfToday'})".replace('dateOfToday', new Date().getTime())], function (oojs) {
           oojs({
-            ATTACH_URL: "${instanceUrl}${attachUrl}".replace('dateOfToday', new Date().getTime()),
+            ATTACH_URL: "${instanceUrl}${attachUrl}",
             CONVERSION: "$OO_CONVERSION",
             NETFLUX_WEBSOCKET: $jsontool.serialize($services.websocket.url('netflux')),
             NETFLUX_CLIENT: $jsontool.serialize($services.webjars.url('org.xwiki.contrib:netflux-websocket-webjar', 'netflux-client.min.js')),

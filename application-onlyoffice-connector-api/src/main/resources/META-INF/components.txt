@@ -1,4 +1,5 @@
 com.xwiki.onlyofficeconnector.internal.DefaultAttachmentFormatManager
 com.xwiki.onlyofficeconnector.internal.DefaultOnlyOfficeManager
 com.xwiki.onlyofficeconnector.internal.rest.DefaultAttachmentFormatResource
+com.xwiki.onlyofficeconnector.internal.rest.DefaultOnlyOfficeResource
 com.xwiki.onlyofficeconnector.script.OnlyOfficeScriptService
