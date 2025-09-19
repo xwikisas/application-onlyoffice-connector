@@ -233,6 +233,7 @@ define(['jquery'], function ($) {
       document: {
         title: ctx.config.FILENAME,
         url: ctx.config.ATTACH_URL,
+        attachRef: ctx.config.ATTACH_REF,
         fileType: ctx.fileType,
         key: ctx.key,
         vkey: ctx.vkey,
