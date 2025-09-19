@@ -38,7 +38,6 @@ import org.xwiki.rest.internal.resources.pages.ModifiablePageResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -46,6 +45,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xwiki.onlyofficeconnector.AttachmentConversionException;
 import com.xwiki.onlyofficeconnector.AttachmentFormatManager;
 import com.xwiki.onlyofficeconnector.OnlyOfficeManager;
+import com.xwiki.onlyofficeconnector.configuration.OnlyOfficeConfiguration;
 import com.xwiki.onlyofficeconnector.rest.AttachmentFormatResource;
 
 /**
@@ -65,6 +65,9 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
     private OfficeServer officeServer;
 
     @Inject
+    private OnlyOfficeConfiguration onlyOfficeConfiguration;
+
+    @Inject
     private AttachmentFormatManager attachmentFormatManager;
 
     @Inject
@@ -78,7 +81,7 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
         String format, Boolean fallBack) throws XWikiRestException
     {
         XWikiContext wikiContext = getXWikiContext();
-        String authToken = wikiContext.getRequest().getHeader(onlyOfficeManager.getAuthorizationHeader());
+        String authToken = wikiContext.getRequest().getHeader(onlyOfficeConfiguration.getAuthorizationHeader());
         if (authToken == null || !authToken.startsWith(BEARER_KEY)) {
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
@@ -141,9 +144,8 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
         }
         try {
             XWikiContext wikiContext = getXWikiContext();
-            XWiki wiki = wikiContext.getWiki();
-            XWikiDocument doc =
-                wiki.getDocument(new DocumentReference(wikiName, parseSpaceSegments(spaces), pageName), wikiContext);
+            XWikiDocument doc = wikiContext.getWiki()
+                .getDocument(new DocumentReference(wikiName, parseSpaceSegments(spaces), pageName), wikiContext);
             XWikiAttachment attachment = doc.getAttachment(attachmentName);
             if (attachment == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);

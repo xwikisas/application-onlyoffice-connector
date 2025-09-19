@@ -38,6 +38,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xwiki.onlyofficeconnector.OnlyOfficeManager;
+import com.xwiki.onlyofficeconnector.configuration.OnlyOfficeConfiguration;
 import com.xwiki.onlyofficeconnector.rest.OnlyOfficeResource;
 
 /**
@@ -57,6 +58,9 @@ public class DefaultOnlyOfficeResource implements OnlyOfficeResource
     private OnlyOfficeManager onlyOfficeManager;
 
     @Inject
+    private OnlyOfficeConfiguration onlyOfficeConfiguration;
+
+    @Inject
     private Provider<XWikiContext> wikiContextProvider;
 
     @Inject
@@ -71,7 +75,7 @@ public class DefaultOnlyOfficeResource implements OnlyOfficeResource
     {
         try {
             XWikiContext xcontext = this.wikiContextProvider.get();
-            String authHeader = xcontext.getRequest().getHeader(onlyOfficeManager.getAuthorizationHeader());
+            String authHeader = xcontext.getRequest().getHeader(onlyOfficeConfiguration.getAuthorizationHeader());
             if (authHeader != null && authHeader.startsWith(BEARER_KEY)) {
                 String token = authHeader.substring(BEARER_KEY.length());
                 JWT decoded = onlyOfficeManager.readToken(token);

@@ -3,3 +3,5 @@ com.xwiki.onlyofficeconnector.internal.DefaultOnlyOfficeManager
 com.xwiki.onlyofficeconnector.internal.rest.DefaultAttachmentFormatResource
 com.xwiki.onlyofficeconnector.internal.rest.DefaultOnlyOfficeResource
 com.xwiki.onlyofficeconnector.script.OnlyOfficeScriptService
+com.xwiki.onlyofficeconnector.internal.configuration.DefaultOnlyOfficeConfiguration
+com.xwiki.onlyofficeconnector.internal.configuration.OnlyOfficeConfigurationSource

@@ -51,13 +51,4 @@ public interface OnlyOfficeManager
      * @return the JWT object that.
      */
     JWT readToken(String token);
-
-    /**
-     * Get the authorization header from the only office configuration.
-     *
-     * @return the authorization header
-     * @since 2.5.0
-     */
-    @Unstable
-    String getAuthorizationHeader();
 }
