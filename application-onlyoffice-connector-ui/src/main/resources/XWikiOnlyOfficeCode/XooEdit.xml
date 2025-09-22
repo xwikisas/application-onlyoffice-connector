@@ -145,6 +145,8 @@
       &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
       &lt;title&gt;${currentAction}$escapetool.xml($request.filename)&lt;/title&gt;
       #template('stylesheets.vm')
+      #template('javascript.vm')
+
       &lt;link rel="stylesheet" type="text/css" href="$doc.getURL('ssx')"&gt;
       ## Old IE
       &lt;link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" /&gt;
@@ -155,13 +157,7 @@
       ## For smart phones and tablets
       &lt;link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" /&gt;
 
-      &lt;script type="text/javascript" src="$services.webjars.url('requirejs', 'require.min.js')"&gt;&lt;/script&gt;
       &lt;script type="text/javascript" language="javascript"&gt;
-        require.config({
-          paths: {
-            'jquery': "$services.webjars.url('jquery', 'jquery.min.js')"
-          }
-        });
         require.onError = function(err) {
           var div = document.getElementById('iframeEditor');
           if (!div) {

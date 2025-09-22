@@ -61,6 +61,7 @@ xoo.inFrameContent.editConvertibleVersion.title=This document type ({0}) cannot 
 xoo.inFrameContent.editConvertibleVersion.value=Edit version
 xoo.inFrameContent.loading=Loading OnlyOffice...
 xoo.inFrameContent.onPage=on page
+xoo.editor.cancel.confirm=You have unsaved changes. Are you sure you want to continue?
 xoo.validation.attachmentExists=An attachment with that name ({0}) already exists. Please choose another name.
 xoo.validation.attachmentMissing=Document or attachment not found!
 xoo.validation.documentMissing=Document parameter required!

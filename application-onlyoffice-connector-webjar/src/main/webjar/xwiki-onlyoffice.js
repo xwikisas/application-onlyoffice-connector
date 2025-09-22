@@ -17,7 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(['jquery'], function ($) {
+define('xwiki-onlyoffice-wrapper', {
+  prefix: 'xoo.editor.',
+  keys: [
+    'cancel.confirm'
+  ]
+});
+define(['jquery', 'xwiki-l10n!xwiki-onlyoffice-wrapper'], function ($, l10n) {
   var TEXT_EXTENSIONS = [
     "djvu", "doc", "docx", "epub", "fb2", "htm", "html", "mht", "odt",
     "pdf", "rtf", "txt", "xps"
@@ -206,9 +212,15 @@ define(['jquery'], function ($) {
       ready = true;
       console.log("Document editor ready2");
       $('#button-cancel').on('click', function () {
+        if (window.docEditor && window.docEditor.xwikiEdited && !confirm(l10n.get('cancel.confirm'))) {
+          return;
+        }
         window.location.href = ctx.config.DOCU_VIEW_URL;
       });
       $('#button-sac').on('click', save(function () {
+        if (window.docEditor) {
+          window.docEditor.xwikiEdited = false;
+        }
         console.log("saved");
       }, false));
       $('#button-sav').on('click', save(function () {
@@ -265,7 +277,12 @@ define(['jquery'], function ($) {
         onRequestEditRights: function () { docEditor.applyEditRights(true); },
         // The event.data will be true when the current user is editing the document and false when the current user's
         // changes are sent to the document editing service.
-        onDocumentStateChange: function (evt) { $('#button-sav').prop('disabled', evt.data); },
+        onDocumentStateChange: function (evt) {
+          $('#button-sav').prop('disabled', evt.data);
+          if (window.docEditor) {
+            window.docEditor.xwikiEdited = true;
+          }
+        },
         onError: onError
       }
     };
