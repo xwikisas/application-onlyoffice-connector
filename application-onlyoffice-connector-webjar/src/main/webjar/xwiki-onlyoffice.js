@@ -17,7 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(['jquery'], function ($) {
+define('xwiki-onlyoffice-wrapper', {
+  prefix: 'xoo.editor.',
+  keys: [
+    'cancel.confirm'
+  ]
+});
+define(['jquery', 'xwiki-l10n!xwiki-onlyoffice-wrapper'], function ($, l10n) {
   var TEXT_EXTENSIONS = [
     "djvu", "doc", "docx", "epub", "fb2", "htm", "html", "mht", "odt",
     "pdf", "rtf", "txt", "xps"
@@ -206,7 +212,7 @@ define(['jquery'], function ($) {
       ready = true;
       console.log("Document editor ready2");
       $('#button-cancel').on('click', function () {
-        if (window.docEditor && window.docEditor.xwikiEdited && !confirm("Canceling without saving! Continue?")) {
+        if (window.docEditor && window.docEditor.xwikiEdited && !confirm(l10n.get('cancel.confirm'))) {
           return;
         }
         window.location.href = ctx.config.DOCU_VIEW_URL;
