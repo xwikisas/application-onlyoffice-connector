@@ -54,41 +54,41 @@ public class DefaultOnlyOfficeConfiguration implements OnlyOfficeConfiguration
 
     @Inject
     @Named(OnlyOfficeConfigurationSource.HINT)
-    private ConfigurationSource mainConfiguration;
+    private ConfigurationSource configuration;
 
     @Override
     public String getSecret()
     {
-        return this.mainConfiguration.getProperty(SERVER_SECRET_KEY, "");
+        return this.configuration.getProperty(SERVER_SECRET_KEY, "");
     }
 
     @Override
     public String getOnlyOfficeServer()
     {
-        return this.mainConfiguration.getProperty(ONLY_OFFICE_SERVER_KEY, "");
+        return this.configuration.getProperty(ONLY_OFFICE_SERVER_KEY, "");
     }
 
     @Override
     public boolean isRealtimeEnabled()
     {
-        return this.mainConfiguration.getProperty(ENABLE_REALTIME_KEY, true);
+        return this.configuration.getProperty(ENABLE_REALTIME_KEY, true);
     }
 
     @Override
     public boolean isCreationEnabled()
     {
-        return this.mainConfiguration.getProperty(ENABLE_CREATION_KEY, true);
+        return this.configuration.getProperty(ENABLE_CREATION_KEY, true);
     }
 
     @Override
     public String getConversion()
     {
-        return this.mainConfiguration.getProperty(CONVERSION_KEY, "");
+        return this.configuration.getProperty(CONVERSION_KEY, "");
     }
 
     @Override
     public String getAuthorizationHeader()
     {
-        return this.mainConfiguration.getProperty(AUTHORIZATION_HEADER_KEY, DEFAULT_AUTHORIZATION_HEADER);
+        return this.configuration.getProperty(AUTHORIZATION_HEADER_KEY, DEFAULT_AUTHORIZATION_HEADER);
     }
 }
