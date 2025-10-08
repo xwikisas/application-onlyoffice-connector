@@ -37,21 +37,9 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-#set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-#set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
-#set ($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').getValue())
-#if ("$!OO_USE_GLOBAL_CONFIG" != "0" )
-  #set ($OO_CONF_REF = $services.model.createDocumentReference($xcontext.getMainWikiName(), 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-  #set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-  #set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
-#end
-#set ($OO_SERVER = $OO_CONF_OBJ.getProperty('onlyOfficeServer').getValue())
-#set ($ALLOW_REALTIME = $OO_CONF_OBJ.getProperty('enableRealtime').getValue())
-#set ($OO_CONVERSION = $OO_CONF_OBJ.getProperty('conversion').getValue())
-#if ("$!OO_SERVER" == '')
-  #set ($OO_SERVER = 'https://onlyoffice.xwiki.com')
-#end
+#set ($OO_SERVER = $services.onlyoffice.getOnlyOfficeServer())
+#set ($ALLOW_REALTIME = $services.onlyoffice.isRealtimeEnabled())
+#set ($OO_CONVERSION = $services.onlyoffice.getConversionOption())
 #set ($CONVERTABLE_FILETYPES0 = {
   '.docx': ['.doc', '.odt', '.html', '.htm', '.rtf', '.txt', '.mht'],
   '.xlsx': ['.xls', '.ods', '.csv'],
@@ -66,7 +54,7 @@
   #set ($discard = $EDITABLE_FILETYPES.addAll(['.odt', '.ods', '.odp']))
   #set ($ODF_FILETYPES = {'.odt': '.docx', '.ods': '.xlsx', '.odp': '.odp'})
 #end
-#set ($OO_AUTH_HEADER = $OO_CONF_OBJ.getProperty('authorizationHeader').getValue())
+#set ($OO_AUTH_HEADER = $services.onlyoffice.getAuthorizationHeader())
 ##
 #if ("$!request.document" == '')
   $escapetool.xml($services.localization.render('xoo.validation.documentMissing'))
@@ -131,7 +119,7 @@
       #set ($mode = 'view')
     #end
   #end
-  #if ($mode == 'edit')
+  #if ($mode == 'edit' &amp;&amp; $docu.hasAccessLevel('edit'))
     #set ($currentAction = "$escapetool.xml($services.localization.render('editing')) ")
     #set ($canEdit = true)
   #else
@@ -169,19 +157,21 @@
           }
         }
         #set ($instanceUrl = $stringtool.replace($request.requestURL, $request.requestURI, ''))
-        #set ($attachUrl = "$docu.getAttachmentURL($filename,'download','cb=dateOfToday')")
+        #set ($serializedAttachRef = $services.model.serialize($attachment.getReference(), 'default'))
+        #set ($attachUrl = "/xwiki/rest/onlyoffice/attachment/content?attach_ref=$serializedAttachRef")
         #if ($OO_CONVERSION == 'officeServer' &amp;&amp; $mode == 'edit')
           #set ($attachUrl = "${services.rest.url($docu.documentReference)}/attachments/${filename}/formats/${ODF_FILETYPES.get($fileType).substring(1)}?fallback=true&amp;cb=dateOfToday")
         #end
         require(["$services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', 'xwiki-onlyoffice.js', { 'cb': 'dateOfToday'})".replace('dateOfToday', new Date().getTime())], function (oojs) {
           oojs({
-            ATTACH_URL: "${instanceUrl}${attachUrl}".replace('dateOfToday', new Date().getTime()),
+            ATTACH_URL: "${instanceUrl}${attachUrl}",
+            ATTACH_REF: "${serializedAttachRef}",
             CONVERSION: "$OO_CONVERSION",
             NETFLUX_WEBSOCKET: $jsontool.serialize($services.websocket.url('netflux')),
             NETFLUX_CLIENT: $jsontool.serialize($services.webjars.url('org.xwiki.contrib:netflux-websocket-webjar', 'netflux-client.min.js')),
             CHANNEL_REST: "${services.rest.url($docu.documentReference)}/channels",
             // Realtime
-            ALLOW_REALTIME: "$!ALLOW_REALTIME" === '1',
+            ALLOW_REALTIME: $!ALLOW_REALTIME,
             OOAPI_PATH: "${OO_SERVER}/web-apps/apps/api/documents/api.js",
             GETTOKEN_URL: "$xwiki.getURL('XWikiOnlyOfficeCode.GetToken', 'get')",
             AUTH_HEADER: "$OO_AUTH_HEADER",
@@ -1116,17 +1106,8 @@ html#ooFrame {
       <content>{{velocity}}
   {{html clean="false"}}
   #if ($xcontext.action == 'view')
-    #set ($OO_CONF_REF = $services.model.createDocumentReference('', 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-    #set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-    #set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
-    #set ($OO_USE_GLOBAL_CONFIG = $OO_CONF_OBJ.getProperty('useGlobalConfig').getValue())
-    #if ("$!OO_USE_GLOBAL_CONFIG" != "0" )
-      #set ($OO_CONF_REF = $services.model.createDocumentReference($xcontext.getMainWikiName(), 'XWikiOnlyOfficeCode', 'ConfigurationClass'))
-      #set ($OO_CONF_DOC = $xwiki.getDocument($OO_CONF_REF))
-      #set ($OO_CONF_OBJ = $OO_CONF_DOC.getObject('XWikiOnlyOfficeCode.ConfigurationClass'))
-    #end
-    #set ($enableCreate = "$!OO_CONF_OBJ.getProperty('enableCreation').getValue()" == '1')
-    #set ($forcedConversion = "$!OO_CONF_OBJ.getProperty('conversion').getValue()" == 'force')
+    #set ($enableCreate = $services.onlyoffice.isCreationEnabled())
+    #set ($forcedConversion = "$!services.onlyoffice.getConversionOption()" == 'force')
     #set ($config = {
       'enableCreation': $enableCreate,
       'forcedConversion': $forcedConversion

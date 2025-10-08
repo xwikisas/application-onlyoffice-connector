@@ -245,6 +245,7 @@ define(['jquery', 'xwiki-l10n!xwiki-onlyoffice-wrapper'], function ($, l10n) {
       document: {
         title: ctx.config.FILENAME,
         url: ctx.config.ATTACH_URL,
+        attachRef: ctx.config.ATTACH_REF,
         fileType: ctx.fileType,
         key: ctx.key,
         vkey: ctx.vkey,

@@ -23,9 +23,9 @@ package com.xwiki.onlyofficeconnector.internal;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.primeframework.jwt.Signer;
 import org.primeframework.jwt.Verifier;
 import org.primeframework.jwt.domain.JWT;
@@ -33,53 +33,54 @@ import org.primeframework.jwt.hmac.HMACSigner;
 import org.primeframework.jwt.hmac.HMACVerifier;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xwiki.onlyofficeconnector.OnlyOfficeManager;
+import com.xwiki.onlyofficeconnector.configuration.OnlyOfficeConfiguration;
 
 /**
  * The default {@link OnlyOfficeManager} implementation that retrieves the JWT secret from the configuration file.
- * @since 2.2.0
+ *
  * @version $Id$
+ * @since 2.2.0
  */
 @Component
 @Singleton
 public class DefaultOnlyOfficeManager implements OnlyOfficeManager
 {
-    private static final LocalDocumentReference CONFIG_REFERENCE = new LocalDocumentReference("XWikiOnlyOfficeCode",
-        "ConfigurationClass");
-
-    private static final LocalDocumentReference CONFIG_CLASS_REFERENCE = CONFIG_REFERENCE;
-
-    private static final String SERVER_SECRET_KEY = "serverSecret";
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
-
     @Inject
     private Logger logger;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private OnlyOfficeConfiguration onlyOfficeConfiguration;
+
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    private AttachmentReferenceResolver<String> attachmentReferenceResolver;
 
     @Override
     public String createToken(final Map<String, Object> payloadClaims)
     {
         try {
-            // build a HMAC signer using a SHA-256 hash
-            Signer signer = HMACSigner.newSHA256Signer(getSecret());
-            JWT jwt = new JWT();
-            for (String key : payloadClaims.keySet()) {
-                jwt.addClaim(key, payloadClaims.get(key));
+            String token = "";
+            if (hasRights(payloadClaims)) {
+                // build a HMAC signer using a SHA-256 hash
+                Signer signer = HMACSigner.newSHA256Signer(onlyOfficeConfiguration.getSecret());
+                JWT jwt = new JWT();
+                for (String key : payloadClaims.keySet()) {
+                    jwt.addClaim(key, payloadClaims.get(key));
+                }
+                token = JWT.getEncoder().encode(jwt, signer);
             }
-            return JWT.getEncoder().encode(jwt, signer);
+            return token;
         } catch (Exception e) {
+            logger.error("There was an error while attempting to encode the token.", e);
             return "";
         }
     }
@@ -89,34 +90,33 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
     {
         try {
             // build a HMAC verifier using the token secret
-            Verifier verifier = HMACVerifier.newVerifier(getSecret());
+            Verifier verifier = HMACVerifier.newVerifier(onlyOfficeConfiguration.getSecret());
 
             // verify and decode the encoded string JWT to a rich object
             return JWT.getDecoder().decode(token, verifier);
         } catch (Exception exception) {
+            logger.error("There was an error while attempting to decode the token.", exception);
             return null;
         }
     }
 
-    private String getSecret()
+    private boolean hasRights(Map<String, Object> payloadClaims)
     {
-        XWikiContext context = contextProvider.get();
-
         try {
-            XWikiDocument document = context.getWiki().getDocument(CONFIG_REFERENCE, context);
-            BaseObject baseObject = document.getXObject(CONFIG_CLASS_REFERENCE);
-            if (baseObject.getStringValue("useGlobalConfig").equals("0")) {
-                return baseObject.getStringValue(SERVER_SECRET_KEY);
-            } else {
-                WikiReference wikiReference = wikiDescriptorManager.getMainWikiDescriptor().getReference();
-                DocumentReference mainWikiConfigRef = new DocumentReference(CONFIG_REFERENCE, wikiReference);
-                XWikiDocument mainWikiDoc = context.getWiki().getDocument(mainWikiConfigRef, context);
-                BaseObject mainWikiBaseObject = mainWikiDoc.getXObject(CONFIG_CLASS_REFERENCE);
-                return mainWikiBaseObject.getStringValue(SERVER_SECRET_KEY);
+            Map<String, Object> documentMap = (Map<String, Object>) payloadClaims.get("document");
+            AttachmentReference attachRef = attachmentReferenceResolver.resolve((String) documentMap.get("attachRef"));
+            authorizationManager.checkAccess(Right.VIEW, attachRef);
+            Map<String, Boolean> permissions = (Map<String, Boolean>) documentMap.get("permissions");
+            if (permissions.getOrDefault("edit", false)) {
+                authorizationManager.checkAccess(Right.EDIT, attachRef);
             }
+            return true;
+        } catch (AccessDeniedException e) {
+            logger.error("Token creation unauthorized", e);
         } catch (Exception e) {
-            logger.warn("Failed to retrieve the secret for generating/verifying a JWT.");
-            return "";
+            logger.error("There was an error while attempting to check the rights for the token creation. "
+                + "Root cause is: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
+        return false;
     }
 }
