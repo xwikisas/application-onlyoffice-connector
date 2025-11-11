@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.primeframework.jwt.domain.JWT;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
@@ -52,8 +51,6 @@ import com.xwiki.onlyofficeconnector.rest.OnlyOfficeResource;
 @Singleton
 public class DefaultOnlyOfficeResource implements OnlyOfficeResource
 {
-    private static final String BEARER_KEY = "Bearer ";
-
     @Inject
     private OnlyOfficeManager onlyOfficeManager;
 
@@ -74,21 +71,19 @@ public class DefaultOnlyOfficeResource implements OnlyOfficeResource
     public Response getContent(String attachRef) throws XWikiRestException
     {
         try {
-            XWikiContext xcontext = this.wikiContextProvider.get();
-            String authHeader = xcontext.getRequest().getHeader(onlyOfficeConfiguration.getAuthorizationHeader());
-            if (authHeader != null && authHeader.startsWith(BEARER_KEY)) {
-                String token = authHeader.substring(BEARER_KEY.length());
-                JWT decoded = onlyOfficeManager.readToken(token);
-                if (decoded != null) {
-                    AttachmentReference attachmentReference = this.attachmentReferenceResolver.resolve(attachRef);
-                    DocumentReference documentReference = attachmentReference.getDocumentReference();
-                    XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
-                    XWikiAttachment attachment = doc.getAttachment(attachmentReference.getName());
+            logger.debug("Request to get content initiated for attachment: [{}].", attachRef);
+            onlyOfficeManager.checkAuthorizationToken();
+            XWikiContext xcontext = wikiContextProvider.get();
+            AttachmentReference attachmentReference = this.attachmentReferenceResolver.resolve(attachRef);
+            DocumentReference documentReference = attachmentReference.getDocumentReference();
+            XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
+            XWikiAttachment attachment = doc.getAttachment(attachmentReference.getName());
 
-                    return Response.ok().entity(attachment.getContentInputStream(xcontext))
-                        .type(attachment.getMimeType()).build();
-                }
-            }
+            return Response.ok().entity(attachment.getContentInputStream(xcontext))
+                .type(attachment.getMimeType()).build();
+        } catch (SecurityException ex) {
+            logger.warn("There was a security issue while attempting to get the content of [{}]: [{}]", attachRef,
+                ex.getMessage());
             return Response.status(Response.Status.UNAUTHORIZED).build();
         } catch (Exception e) {
             logger.warn("Failed to get content of file [{}]. Root cause: [{}]", attachRef,

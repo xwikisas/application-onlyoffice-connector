@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.primeframework.jwt.domain.JWT;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -76,17 +76,22 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
     @Inject
     private OnlyOfficeManager onlyOfficeManager;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public Response convertAttachment(String wikiName, String spaces, String pageName, String attachmentName,
         String format, Boolean fallBack) throws XWikiRestException
     {
-        XWikiContext wikiContext = getXWikiContext();
-        String authToken = wikiContext.getRequest().getHeader(onlyOfficeConfiguration.getAuthorizationHeader());
-        if (authToken == null || !authToken.startsWith(BEARER_KEY)) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        logger.debug("Request to convert attachment [{}] to format [{}] initiated.", attachmentName, format);
+        try {
+            onlyOfficeManager.checkAuthorizationToken();
+        } catch (SecurityException exc) {
+            logger.warn("There was a security issue while attempting to to convert attachment [{}] to format [{}: [{}]",
+                attachmentName, format, exc.getMessage());
+            return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        XWikiAttachment attachment =
-            getAttachment(wikiName, spaces, pageName, attachmentName, authToken.substring(BEARER_KEY.length()));
+        XWikiAttachment attachment = getAttachment(wikiName, spaces, pageName, attachmentName);
 
         OfficeConverter converter = officeServer.getConverter();
         OfficeDocumentFormat inputFormat = converter.getDocumentFormat(attachmentName);
@@ -104,11 +109,17 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
                 .entity(result)
                 .build();
         } catch (AttachmentConversionException e) {
+            String errorMessage =
+                String.format("Failed to convert attachment [%s] to format [%s].", attachmentName, format);
+            logger.warn(errorMessage, e);
             if (Boolean.TRUE.equals(fallBack)) {
+                logger.debug("Attempting conversion fallback.");
                 try {
+                    XWikiContext wikiContext = getXWikiContext();
                     return Response.ok().type(attachment.getMimeType())
                         .entity(attachment.getContentInputStream(wikiContext).readAllBytes()).build();
                 } catch (Exception ex) {
+                    logger.warn("Failed attachment conversion fallback", ex);
                     throw new XWikiRestException(ex);
                 }
             }
@@ -135,13 +146,9 @@ public class DefaultAttachmentFormatResource extends ModifiablePageResource impl
         }
     }
 
-    private XWikiAttachment getAttachment(String wikiName, String spaces, String pageName, String attachmentName,
-        String authToken) throws XWikiRestException
+    private XWikiAttachment getAttachment(String wikiName, String spaces, String pageName, String attachmentName)
+        throws XWikiRestException
     {
-        JWT decoded = onlyOfficeManager.readToken(authToken);
-        if (decoded == null) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
         try {
             XWikiContext wikiContext = getXWikiContext();
             XWikiDocument doc = wikiContext.getWiki()

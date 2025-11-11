@@ -51,4 +51,12 @@ public interface OnlyOfficeManager
      * @return the JWT object that.
      */
     JWT readToken(String token);
+
+    /**
+     * Check if the request authorization token is valid.
+     *
+     * @since 2.5.1
+     */
+    @Unstable
+    void checkAuthorizationToken() throws SecurityException;
 }

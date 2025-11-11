@@ -23,6 +23,7 @@ package com.xwiki.onlyofficeconnector.internal;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -39,6 +40,7 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xwiki.onlyofficeconnector.OnlyOfficeManager;
 import com.xwiki.onlyofficeconnector.configuration.OnlyOfficeConfiguration;
 
@@ -52,6 +54,8 @@ import com.xwiki.onlyofficeconnector.configuration.OnlyOfficeConfiguration;
 @Singleton
 public class DefaultOnlyOfficeManager implements OnlyOfficeManager
 {
+    private static final String BEARER_KEY = "Bearer ";
+
     @Inject
     private Logger logger;
 
@@ -63,6 +67,9 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
 
     @Inject
     private AttachmentReferenceResolver<String> attachmentReferenceResolver;
+
+    @Inject
+    private Provider<XWikiContext> wikiContextProvider;
 
     @Override
     public String createToken(final Map<String, Object> payloadClaims)
@@ -98,6 +105,33 @@ public class DefaultOnlyOfficeManager implements OnlyOfficeManager
             logger.error("There was an error while attempting to decode the token.", exception);
             return null;
         }
+    }
+
+    @Override
+    public void checkAuthorizationToken() throws SecurityException
+    {
+        logger.debug("Initiating authorization token validation.");
+        XWikiContext xcontext = this.wikiContextProvider.get();
+        String authHeaderName = onlyOfficeConfiguration.getAuthorizationHeader();
+        logger.debug("Authorization header name: [{}]", authHeaderName);
+        String authHeader = xcontext.getRequest().getHeader(authHeaderName);
+        if (authHeader == null) {
+            logger.debug("No authorization header found in the request.");
+            throw new SecurityException("Missing authorization header.");
+        }
+        if (!authHeader.startsWith(BEARER_KEY)) {
+            logger.debug("Authorization header does not start with Bearer [{}] prefix. Header: [{}]", BEARER_KEY,
+                authHeader);
+            throw new SecurityException("Invalid authorization header format.");
+        }
+
+        String token = authHeader.substring(BEARER_KEY.length());
+        logger.debug("Bearer token found. Token length: {}", token.length());
+        JWT decoded = readToken(token);
+        if (decoded == null) {
+            throw new SecurityException("Failed to decode JWT.");
+        }
+        logger.debug("Authorization token successfully validated.");
     }
 
     private boolean hasRights(Map<String, Object> payloadClaims)
