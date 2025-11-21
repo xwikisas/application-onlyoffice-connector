@@ -211,10 +211,17 @@ define(['jquery', 'xwiki-l10n!xwiki-onlyoffice-wrapper'], function ($, l10n) {
       if (ready) { return; }
       ready = true;
       console.log("Document editor ready2");
+      window.addEventListener('beforeunload', (event) => {
+      if (window.docEditor && window.docEditor.xwikiEdited) {
+        event.preventDefault();
+        event.returnValue = ''; //Show default browser "unsaved changes" message
+      }
+      });
       $('#button-cancel').on('click', function () {
         if (window.docEditor && window.docEditor.xwikiEdited && !confirm(l10n.get('cancel.confirm'))) {
           return;
         }
+        window.docEditor.xwikiEdited = false; //Mark editor as not dirty to prevent popup when leaving
         window.location.href = ctx.config.DOCU_VIEW_URL;
       });
       $('#button-sac').on('click', save(function () {
@@ -225,6 +232,7 @@ define(['jquery', 'xwiki-l10n!xwiki-onlyoffice-wrapper'], function ($, l10n) {
       }, false));
       $('#button-sav').on('click', save(function () {
         console.log("saved2");
+        window.docEditor.xwikiEdited = false; //Mark editor as not dirty to prevent popup when leaving
         window.location.href = ctx.config.DOCU_VIEW_URL;
       }, false));
       $('#button-ecv').on('click', switchToSaveableFile);
