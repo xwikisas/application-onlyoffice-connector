@@ -158,9 +158,9 @@
         }
         #set ($instanceUrl = $stringtool.replace($request.requestURL, $request.requestURI, ''))
         #set ($serializedAttachRef = $services.model.serialize($attachment.getReference(), 'default'))
-        #set ($attachUrl = "/xwiki/rest/onlyoffice/attachment/content?attach_ref=$escapetool.url($serializedAttachRef)")
+        #set ($attachUrl = "/xwiki/rest/onlyoffice/attachment/content?attach_ref=${escapetool.url($serializedAttachRef)}")
         #if ($OO_CONVERSION == 'officeServer' &amp;&amp; $mode == 'edit')
-          #set ($attachUrl = "${services.rest.url($docu.documentReference)}/attachments/${filename}/formats/${ODF_FILETYPES.get($fileType).substring(1)}?fallback=true&amp;cb=dateOfToday")
+          #set ($attachUrl = "${services.rest.url($docu.documentReference)}/attachments/${escapetool.url($filename)}/formats/${ODF_FILETYPES.get($fileType).substring(1)}?fallback=true&amp;cb=dateOfToday")
         #end
         require(["$services.webjars.url('com.xwiki.onlyoffice-connector:application-onlyoffice-connector-webjar', 'xwiki-onlyoffice.js', { 'cb': 'dateOfToday'})".replace('dateOfToday', new Date().getTime())], function (oojs) {
           oojs({
