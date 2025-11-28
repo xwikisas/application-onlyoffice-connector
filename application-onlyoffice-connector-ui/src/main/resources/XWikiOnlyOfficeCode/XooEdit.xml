@@ -128,7 +128,7 @@
   #end
   {{html clean=false}}
   &lt;!DOCTYPE html&gt;
-  &lt;html id="ooFrame"&gt;
+  &lt;html id="ooFrame" lang="$xwiki.getLocalePreference()"&gt;
     &lt;head&gt;
       &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
       &lt;title&gt;${currentAction}$escapetool.xml($request.filename)&lt;/title&gt;
