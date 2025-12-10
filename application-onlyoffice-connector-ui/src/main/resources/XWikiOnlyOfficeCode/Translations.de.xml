@@ -1,0 +1,78 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWikiOnlyOfficeCode.Translations" locale="de">
+  <web>XWikiOnlyOfficeCode</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWikiOnlyOfficeCode.ConfigurationClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+    <content>xoo.extension.name=OnlyOffice Connector Application
+        xoo.creationButtons.prez.label=Neue Präsentation
+        xoo.creationButtons.sheet.label=Neue Tabelle
+        xoo.creationButtons.text.label=Neues Dokument
+        xoo.creationModal.presentation.title=Name der Präsentation
+        xoo.creationModal.presentation.inputPlaceholder=Praesentation
+        xoo.creationModal.presentation.creationButton=Erstelle Präsentation
+        xoo.creationModal.spreadsheet.title=Name der Tabelle
+        xoo.creationModal.spreadsheet.inputPlaceholder=Tabelle
+        xoo.creationModal.spreadsheet.creationButton=Erstelle Tabelle
+        xoo.creationModal.document.title=Name des Dokuments
+        xoo.creationModal.document.inputPlaceholder=Dokument
+        xoo.creationModal.document.creationButton=Erstelle Dokument
+        xoo.attachments.actions.convert=Ansehen/Konvertieren mit OnlyOffice
+        xoo.attachments.actions.edit=Bearbeiten mit OnlyOffice
+        xoo.attachments.actions.view=Ansehen in OnlyOffice
+        xoo.attachments.actions.convert.label=Ansehen/Konvertieren
+        xoo.attachments.actions.edit.label=Bearbeiten
+        xoo.attachments.actions.view.label=Ansehen
+        xoo.inFrameContent.convertForEditing.title=Um das Dokument zu bearbeiten, muss es zunächst in ein Microsoft Office&amp;#8482; kompatibles Format konvertiert werden.
+        xoo.inFrameContent.convertForEditing.value=Konvertieren zum Bearbeiten in
+        xoo.inFrameContent.editConvertibleVersion.title=Dokumenten-Typ ({0}) kann nicht mit OnlyOffice bearbeiten werden, aber andere Anhänge ({1}) existieren. Klick zum Bearbeiten.
+        xoo.inFrameContent.editConvertibleVersion.value=Version bearbeiten
+        xoo.inFrameContent.loading=Lade OnlyOffice...
+        xoo.inFrameContent.onPage=auf Seite
+        xoo.editor.cancel.confirm=Es existieren ungespeicherte Änderungen. Fortfahren?
+        xoo.validation.attachmentExists=Ein Anhang mit dem Namen ({0}) existiert bereits. Bitte einen anderen Namen vergeben.
+        xoo.validation.attachmentMissing=Dokument oder Anhang nicht gefunden!
+        xoo.validation.documentMissing=Parameter document erforderlich!
+        xoo.validation.filenameMissing=Parameter filename erforderlich!
+        xoo.config.conversion.officeServerWarning=Die XWiki Instanz nicht nicht mit einem Office Server verbunden. Bitte Office Server konfigurieren oder andere Konvertierungsmethode wählen.
+        XWikiOnlyOfficeCode.ConfigurationClass_conversion=Konvertierung von ODF Dokumenten
+        XWikiOnlyOfficeCode.ConfigurationClass_conversion_Konvertierung in ein anderes Dokument
+        XWikiOnlyOfficeCode.ConfigurationClass_conversion_onlyoffice=(Beta) On the fly mit OnlyOffice
+        XWikiOnlyOfficeCode.ConfigurationClass_conversion_officeServer=(Beta) On the fly mit Office Server
+        XWikiOnlyOfficeCode.ConfigurationClass_serverSecret=Server Secret Key
+        XWikiOnlyOfficeCode.ConfigurationClass_serverSecret_hint=Geheimnis (Secret), welches auf dem OnlyOffice-Server eingestellt ist (ermöglicht XWiki die Erstellung von JWT Token).
+        XWikiOnlyOfficeCode.ConfigurationClass_authorizationHeader=Authorization Header
+        XWikiOnlyOfficeCode.ConfigurationClass_authorizationHeader_hint=Der Anfrage-Header, der den Authorization Token enthält, wenn Daten zu OnlyOffice gesendet werden.</content>
+</xwikidoc>
