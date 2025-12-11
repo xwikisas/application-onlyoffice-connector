@@ -214,7 +214,8 @@ define(['jquery', 'xwiki-l10n!xwiki-onlyoffice-wrapper'], function ($, l10n) {
       window.addEventListener('beforeunload', (event) => {
       if (window.docEditor && window.docEditor.xwikiEdited) {
         event.preventDefault();
-        event.returnValue = ''; //Show default browser "unsaved changes" message
+        // The property is deprecated. We set an empty value to it to ensure compatibility with older browsers.
+        event.returnValue = ''; 
       }
       });
       $('#button-cancel').on('click', function () {
