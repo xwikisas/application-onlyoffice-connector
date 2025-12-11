@@ -222,7 +222,8 @@ define(['jquery', 'xwiki-l10n!xwiki-onlyoffice-wrapper'], function ($, l10n) {
         if (window.docEditor && window.docEditor.xwikiEdited && !confirm(l10n.get('cancel.confirm'))) {
           return;
         }
-        window.docEditor.xwikiEdited = false; //Mark editor as not dirty to prevent popup when leaving
+        // Mark editor as not dirty to prevent popup when leaving
+        window.docEditor.xwikiEdited = false;
         window.location.href = ctx.config.DOCU_VIEW_URL;
       });
       $('#button-sac').on('click', save(function () {
