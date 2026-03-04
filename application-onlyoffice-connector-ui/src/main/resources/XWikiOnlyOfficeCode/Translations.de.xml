@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-    <content>xoo.extension.name=OnlyOffice Connector Application
+  <content>xoo.extension.name=OnlyOffice Connector Application
         xoo.creationButtons.prez.label=Neue Präsentation
         xoo.creationButtons.sheet.label=Neue Tabelle
         xoo.creationButtons.text.label=Neues Dokument
