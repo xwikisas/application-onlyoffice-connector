@@ -932,12 +932,12 @@ html#ooFrame {
     </property>
     <property>
       <code>.btn-ootext {
-  background-image: linear-gradient(#5a7dc9,#496cb8 50%,#385ba7);
+  background-image: linear-gradient(#718abf,#6a80b0 50%,#44619c);
   border: 1px solid #5477c3;
   color: #fff;
 }
 .btn-ootext:hover {
-  background-image: linear-gradient(#496cb8,#385ba7 50%,#274a96);
+  background-image: linear-gradient(#5f7ec2,#5b70a8 50%,#435e99);
   border: 1px solid #4366b2;
 }
 .btn-oosheet {
