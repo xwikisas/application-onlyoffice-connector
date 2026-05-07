@@ -937,8 +937,9 @@ html#ooFrame {
   color: #fff;
 }
 .btn-ootext:hover {
-  background-image: linear-gradient(#5f7ec2,#5b70a8 50%,#435e99);
+  background-image: linear-gradient(#5d7fc9,#5269a8 50%,#3C5996);
   border: 1px solid #4366b2;
+  color: #f0eeeb;
 }
 .btn-oosheet {
   background-image: linear-gradient(#8ca946,#7b9835 50%,#6a8724);
@@ -948,6 +949,7 @@ html#ooFrame {
 .btn-oosheet:hover {
   background-image: linear-gradient(#7b9835,#6a8724 50%,#507613);
   border: 1px solid #759229;
+  color: #f0eeeb;
 }
 .btn-ooprez {
   background-image: linear-gradient(#dd682b,#cc571a 50%,#bb4809);
@@ -957,6 +959,7 @@ html#ooFrame {
 .btn-ooprez:hover {
   background-image: linear-gradient(#cc571a,#bb4809 50%,#aa3702);
   border: 1px solid #c45015;
+  color: #f0eeeb;
 }
 
 .oobutton {
