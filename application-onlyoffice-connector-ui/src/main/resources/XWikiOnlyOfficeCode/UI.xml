@@ -84,12 +84,14 @@
     #if ($fileTypes.size() &gt; 1)
       &lt;select id="oONewFileType"&gt;
         #foreach ($fileType in $fileTypes)
-          &lt;option value="$fileType"&gt;$fileType&lt;/option&gt;
+          #set ($escapedFileType = $escapetool.xml($fileType))
+          &lt;option value="$escapedFileType"&gt;$escapedFileType&lt;/option&gt;
         #end
       &lt;/select&gt;
     #else
-      $fileTypes[0]
-      &lt;input id="oONewFileType" type="hidden" value="$fileTypes[0]"&gt;
+      #set ($escapedFileType = $escapetool.xml($fileTypes[0]))
+      $escapedFileType
+      &lt;input id="oONewFileType" type="hidden" value="$escapedFileType"&gt;
     #end
     &lt;p class="hidden box errormessage" id="oONewFileError"&gt;
       $escapetool.xml($services.localization.render('xoo.validation.attachmentExists', [$attachmentName]))
