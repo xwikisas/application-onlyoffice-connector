@@ -96,7 +96,7 @@
     &lt;p class="hidden box errormessage" id="oONewFileError"&gt;
       $escapetool.xml($services.localization.render('xoo.validation.attachmentExists', [$attachmentName]))
     &lt;/p&gt;
-    &lt;button class="btn btn-success $request.buttonType"&gt;
+    &lt;button class="btn btn-success $escapetool.xml($request.buttonType)"&gt;
       $escapetool.xml($services.localization.render("xoo.creationModal.${request.type}.creationButton"))
     &lt;/button&gt;
   &lt;/div&gt;
